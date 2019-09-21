@@ -1,0 +1,39 @@
+# depslib dependency file v1.0
+1569031182 source:/home/frezcirno/work/calc4/calc4.cpp
+	<stack>
+	<string>
+	<cctype>
+	<cmath>
+
+1569029102 source:/home/frezcirno/work/int2/int2.cpp
+
+1569029255 source:/home/frezcirno/work/main.cpp
+	<iostream>
+
+1569029102 source:/home/frezcirno/work/maze3/maze3.cpp
+	<iomanip>
+	<vector>
+
+1569029102 source:/home/frezcirno/work/reg1/main.cpp
+	"Database.h"
+
+1569029102 /home/frezcirno/work/reg1/Database.h
+	<string>
+	<iostream>
+	<iomanip>
+	"RedBlack.h"
+
+1569029102 /home/frezcirno/work/reg1/RedBlack.h
+	<algorithm>
+
+1569029102 source:/home/frezcirno/work/reg1/testRB.cpp
+	<iostream>
+	"RedBlack.h"
+	<stdlib.h>
+	<time.h>
+	<set>
+	<vector>
+
+1569029102 source:/home/frezcirno/work/sort10/sort10.cpp
+	<iostream>
+
