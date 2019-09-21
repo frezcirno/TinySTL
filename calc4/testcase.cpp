@@ -1,4 +1,4 @@
-﻿#include <iostream>
+#include <iostream>
 #include <stack>
 #include <string>
 #include <cctype>
@@ -198,18 +198,62 @@ int evaluate(const char* s)
 }
 
 
-int main()
-{
-    string s;
-    while(true){
-        cout<<"输入表达式："<<endl;
-        getline(cin, s);
-        cout << evaluate(s.c_str()) << endl;
-        cout << "是否继续（y，n）？";
-        getline(cin, s);
-        if(s[0] != 'y')break;
-    }
-    return 0;
+#define TEST(a,b) cout<<++cases<<" "<<a;if(evaluate(a)==b)pass++;else cout<<evaluate(a);cout<<endl;
+void testcase(){
+    int cases=0;
+    int pass=0;
+    TEST("0=",0);
+    TEST("1=",1);
+    TEST("+1=",1);
+    TEST("-1=",-1);
+    TEST("+-1=",-1);
+    TEST("-+1=",-1);
+    TEST("--1=",1);
+
+    TEST("1+1=",2);
+    TEST("1-1=",0);
+    TEST("+1+1=",2);
+    TEST("-1+1=",0);
+    TEST("-1-1=",-2);
+    TEST("1-2=",-1);
+
+    TEST("(1)=",1);
+    TEST("-(1)=",-1);
+    TEST("-(-1)=",1);
+
+    TEST("1*1=",1);
+    TEST("0*1=",0);
+    TEST("1*0=",0);
+    TEST("0*0=",0);
+    TEST("2/1=",2);
+    TEST("4/2=",2);
+    TEST("1/1=",1);
+
+    TEST("(1^10000)=",1);
+    TEST("2^10=",1024);
+    TEST("(2)*(2)=",4);
+    TEST("(2/1)=",2);
+    TEST("2^10=",1024);
+    TEST("2%10=",2);
+    TEST("11%10=",1);
+    TEST("10000007%10=",7);
+
+    TEST("1&2&4&8&16&32&64=",0);
+    TEST("1|2|4|8|16|32|64=",127);
+    TEST("~-1=",0);
+    TEST("~0=",-1);
+    TEST("~1=",-2);
+    TEST("~2=",-3);
+    TEST("~(~2)=",2);
+
+    TEST("(1+(-1+(-3+4))*(1))=",1);
+    TEST("-2*(3+5)+2^3/4=",-14);
+    TEST("2^4/8-(+2+8)%3=",1);
+
+    cout<<endl<<pass<<"/"<<cases<<"="<<(double)pass/cases*100<<"%"<<endl;
 }
 
-
+int main(){
+    testcase();
+    return 0;
+}
