@@ -14,7 +14,7 @@ class swaper {
         times++;
     }
     void reset() { times = 0; }
-    int times() { return times; }
+    int times() const { return times; }
 };
 
 class comparer {
@@ -29,5 +29,5 @@ class comparer {
         return b - a;
     }
     void reset() { times = 0; }
-    int times() { return times; }
+    int times() const { return times; }
 };
