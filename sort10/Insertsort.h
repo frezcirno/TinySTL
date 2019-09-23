@@ -1,14 +1,10 @@
 #pragma once
 #include "Common.h"
-void Insertsort(int *a, int n, comparer compare, swaper swap) {
-    int min;
-    for (int i = 0; i < n; i++) {
-        min = i;
-        for (int j = i; j < n; j++) {
-            if (compare(a[min], a[j]) > 0) {
-                min = j;
-            }
-        }
-        swap(a[i], a[min]);
+
+void Insertsort(int *a, int n, comparer& compare, swaper& swap){
+    for(int i=0;i<n;i++){
+        int j=0;
+        while(j<i && compare(a[j],a[i])<=0) j++;
+        for(int k=i;k>j;k--) swap(a[k],a[k-1]);
     }
 }
