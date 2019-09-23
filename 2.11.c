@@ -20,9 +20,10 @@ int main() {
     }
     p->link = NULL;
 
-    ListNode *oend = p, *end = p, *pred = l;
+    ListNode *pred = l, *apl = (List)malloc(sizeof(ListNode)), *end = apl;
+    apl->link = NULL;
     p = l->link;
-    while (p != oend) {
+    while (p) {
         if (p->data >= x) {
             end = end->link = p;
             pred->link = p->link;
@@ -33,6 +34,8 @@ int main() {
             p = p->link;
         }
     }
+    pred->link = apl->link;
+    free(apl);
 
     p = l->link;
     if (p) {
