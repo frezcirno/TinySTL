@@ -2,104 +2,79 @@
 using namespace std;
 
 class List {
-private:
-	class LinkNode
-	{
+	private:
+		class LinkNode {
+			public:
+				int data;
+				LinkNode* link;
+		};
+		LinkNode* first;
+		LinkNode* last;
 	public:
-		int data;
-		LinkNode* link;
-	};
-	LinkNode* first;
-	LinkNode* last;
-	LinkNode* now;
-public:
-	void insert(int x);
-	void compare( int diff);
-	void output(int num);
+		List(): first(nullptr), last(nullptr) {	}
+		~List() {LinkNode*p; while(first != last) {p = first; first = first->link; delete p;	}}
+		void insert(int x);
+		void compare(int diff);
+		void output();
 };
-List mylist;
-int main()
-{
-	int num = 0,diff=0;
+int main() {
+	List mylist;
+	int num = 0, diff = 0;
 	cin >> num >> diff;
-	for (int i = 0; i < num; i++)
-	{
-		int x = 0;
+	int x = 0;
+	for (int i = 0; i < num; i++) {
 		cin >> x;
 		mylist.insert(x);
 	}
-	for (int i = 0; i < num; i++)
-	{
-		mylist.compare(diff);
-			
-	}
-	mylist.output(num);
+	mylist.compare(diff);
+	mylist.output();
 	return 0;
 }
 
-void List::insert(int x)
-{
-	LinkNode* newNode= new LinkNode;
+void List::insert(int x) {
+	LinkNode* newNode = new LinkNode;
+	if (newNode == nullptr) cerr << "wrong insert!";
 	newNode->data = x;
-	if (first == nullptr)
-	{
-		if (newNode == nullptr)
-			cerr << "wrong insert!";
-		else {
-			first = newNode;
-			now = first; last = first;
-			first->link = nullptr;
-		}
-	}
-	else
-	{
+
+	if (first == nullptr) {
+		first = newNode;
+		first->link = nullptr;
+		last = first;
+	} else {
 		last->link = newNode;
-		last=newNode;
+		last = newNode;
 		newNode->link = nullptr;
 	}
 }
 
-void List::compare( int diff)
-{
-	if (now->data >= diff)
-	{
-		if (now == first)
-		{
-			LinkNode* p = now;
-			first = first->link;			
-			last->link = p;
-			last = p;
-			now = first;
-		}
-		else
-		{
-			LinkNode* p = now;
-			LinkNode* q = first;
-			while(q->link!=p)
-			{
-				q = q->link;
+void List::compare( int diff) {
+	LinkNode *now = first, *pred, *oldLast = last;
+	if(now)	while(now != oldLast) {
+		LinkNode *next = now->link;
+		if(now->data >= diff) {
+			last->link = now;
+			now->link = nullptr;
+			last = now;
+			if(now == first)
+				now = first = next;
+			else{
+				pred->link = next;
+				now = next;
 			}
-			q->link = p->link;
-			now = p->link;
-			last->link = p;
-			last = p;
+		} else {
+			pred = now;
+			now = next;
 		}
-		
 	}
-	else
-	{
-		now = now->link;
-	}	
 }
-void List::output(int num)
-{
+void List::output() {
 	LinkNode* p = first;
-	for(int k=0;k<(num-1);k++)
-	{
-		cout << p->data << " ";
-		p = p->link;
+	if(p) {
+		while(p->link != NULL) {
+			cout << p->data << " ";
+			p = p->link;
+		}
+		cout << p->data;
 	}
-	cout << p->data;
-
 }
 
