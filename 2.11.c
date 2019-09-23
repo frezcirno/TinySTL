@@ -7,30 +7,34 @@ typedef struct ListNode {
 } ListNode, *List;
 
 int main() {
-    List l1, l2;
-    l1 = (List)malloc(sizeof(ListNode));
-    l2 = (List)malloc(sizeof(ListNode));
-    l1->link = l2->link = NULL;
+    List l;
+    l = (List)malloc(sizeof(ListNode));
+    l->link = NULL;
 
     int num, x;
     scanf("%d %d", &num, &x);
-    ListNode *p1 = l1, *p2 = l2;
+    ListNode* p = l;
     for (int i = 0; i < num; i++) {
-        int a;
-        scanf("%d", &a);
-        if (a < x) {
-            p1 = p1->link = (ListNode*)malloc(sizeof(ListNode));
-            p1->data = a;
+        p = p->link = (ListNode*)malloc(sizeof(ListNode));
+        scanf("%d", &p->data);
+    }
+    p->link = NULL;
+
+    ListNode *oend = p, *end = p, *pred = l;
+    p = l->link;
+    while (p != oend) {
+        if (p->data >= x) {
+            end = end->link = p;
+            pred->link = p->link;
+            p->link = NULL;
+            p = pred->link;
         } else {
-            p2 = p2->link = (ListNode*)malloc(sizeof(ListNode));
-            p2->data = a;
+            pred = p;
+            p = p->link;
         }
     }
-    p1->link = l2->link;
-    p2->link = NULL;
-    free(l2);
 
-    ListNode* p = l1->link;
+    p = l->link;
     if (p) {
         while (p->link) {
             printf("%d ", p->data);
@@ -39,10 +43,10 @@ int main() {
         printf("%d", p->data);
     }
 
-    if (l1) {
-        while (l1) {
-            p = l1;
-            l1 = l1->link;
+    if (l) {
+        while (l) {
+            p = l;
+            l = l->link;
             free(p);
         }
     }
