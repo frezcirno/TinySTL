@@ -6,12 +6,12 @@ int *aux = NULL;
 
 static void merge(int *a, int begin, int mid, int end, comparer &compare,
                   swaper &swap) {
-    int i = begin, j = mid;
     for (int k = begin; k < end; k++) aux[k] = a[k];
+    int i = begin, j = mid;
     for (int k = begin; k < end; k++) {
-        if (i > mid)
+        if (i >= mid)
             a[k] = aux[j++];
-        else if (j > end)
+        else if (j >= end)
             a[k] = aux[i++];
         else if (compare(aux[j], aux[i]) < 0)
             a[k] = aux[j++];
