@@ -2,32 +2,32 @@
 
 class swaper {
    private:
-    int times;
+    int m_times;
 
    public:
-    swaper() : times(0){};
+    swaper() : m_times(0){};
     ~swaper(){};
-    void operator()(int a, int b) {
+    void operator()(int& a, int& b) {
         int c = a;
         a = b;
         b = c;
-        times++;
+        m_times++;
     }
-    void reset() { times = 0; }
-    int times() const { return times; }
+    void reset() { m_times = 0; }
+    int times() const { return m_times; }
 };
 
 class comparer {
    private:
-    int times;
+    int m_times;
 
    public:
-    comparer() : times(0) {}
+    comparer() : m_times(0) {}
     ~comparer() {}
     int operator()(int a, int b) {
-        times++;
+        m_times++;
         return b - a;
     }
-    void reset() { times = 0; }
-    int times() const { return times; }
+    void reset() { m_times = 0; }
+    int times() const { return m_times; }
 };

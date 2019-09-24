@@ -3,7 +3,7 @@
 
 typedef struct ListNode {
     int data;
-    ListNode* link;
+    struct ListNode* link;
 } ListNode, *List;
 
 int main() {

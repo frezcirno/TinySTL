@@ -5,7 +5,7 @@ void Selectsort(int *a, int n, comparer &compare, swaper &swap) {
     for (int i = 0; i < n; i++) {
         min = i;
         for (int j = i; j < n; j++) {
-            if (compare(a[min], a[j]) > 0) {
+            if (compare(a[j], a[min]) < 0) {
                 min = j;
             }
         }
