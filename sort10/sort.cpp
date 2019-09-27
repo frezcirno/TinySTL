@@ -6,6 +6,7 @@
 #include "Quicksort.h"
 #include "Selectsort.h"
 #include "Shellsort.h"
+#include "Heapsort.h"
 
 #include <ctime>
 #include <iostream>
@@ -23,7 +24,7 @@ void testSort (sortfunc sort)
   start = clock();
   sort (a, n, compare, swap);
   end = clock();
-  cout << "\t时间：" << 1000 * (end - start) / CLOCKS_PER_SEC << " ms" << endl;
+  cout << "\t时间：" << 1000.0 / CLOCKS_PER_SEC * (end-start) << " ms" << endl;
   cout << "\t比较次数：" << compare.times () << endl;
   cout << "\t交换次数：" << swap.times () << endl;
 }
@@ -60,6 +61,12 @@ int main ()
   cout << "快速排序：" << endl;
   fillrandom (a, n, seed);
   testSort (Quicksort);
+
+  cout << "堆排序：" << endl;
+  fillrandom (a, n, seed);
+  testSort (Heapsort);
+
+  for(int i=0;i<n;i++)
 
   return 0;
 }
