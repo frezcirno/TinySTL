@@ -26,7 +26,7 @@ class comparer {
     ~comparer() {}
     int operator()(int a, int b) {
         m_times++;
-        return b - a;
+        return (a - b);
     }
     void reset() { m_times = 0; }
     int times() const { return m_times; }

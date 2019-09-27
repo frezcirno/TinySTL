@@ -1,5 +1,11 @@
 #include "Random.h"
 
+void fillrandom(int *a, int n) {
+    for (int i = 0; i < n; i++) {
+        a[i] = rand() % n;
+    }
+}
+
 void fillrandom(int *a, int n, unsigned int seed) {
     srand(seed);
     for (int i = 0; i < n; i++) {

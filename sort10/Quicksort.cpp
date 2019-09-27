@@ -6,7 +6,7 @@ void Quicksort(int* a, int n, comparer& compare, swaper& swap) {
 
 static void sort(int* a, int begin, int end, comparer& compare, swaper& swap) {
     if (begin + 1 >= end) return;
-    int pivot = begin, i = begin + 1, j = end - 1;
+    int pivot = begin, i = begin, j = end - 1;
     while (i != j) {
         while (compare(a[j], a[pivot]) >= 0 && i < j) j--;
         while (compare(a[i], a[pivot]) <= 0 && i < j) i++;
