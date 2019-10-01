@@ -72,5 +72,6 @@ int main() {
     testSort("归并排序", Mergesort, filldescend);
     testSort("快速排序", Quicksort, filldescend);
 
+    delete[] a;
     return 0;
 }
