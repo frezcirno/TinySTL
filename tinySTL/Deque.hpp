@@ -16,16 +16,17 @@ class _DequeIterator {
 
    private:
     static unsigned int buffer_size() {
-        return _buffer_size(buf_siz, sizeof(T));
+        static int _buf_siz = _buffer_size(buf_siz, sizeof(T));
+        return _buf_siz;
     }
 
    public:
     _DequeIterator() {}
     ~_DequeIterator() {}
-    void jump(T** map_node) {
-        map_node = map_node;
-        start = *map_node;
-        finish = *map_node + buffer_size();
+    void jump(T** buf_pos) {
+        map_node = buf_pos;
+        start = *buf_pos;
+        finish = *buf_pos + buffer_size();
     }
     T& operator*() const { return *cur; }
     T* operator->() const { return &(operator*()); }
@@ -65,27 +66,27 @@ class _DequeIterator {
         return old;
     }
 
-    self& operator+=(unsigned int n) {
-        unsigned int newpos = n + (cur - start);
-        if (newpos >= 0 && newpos < buffer_size())
+    self& operator+=(int n) {  //可正可负
+        int index = n + (cur - start);
+        if (index >= 0 && index < buffer_size())
             cur += n;
         else {
-            unsigned int node_pos = newpos > 0
-                                        ? newpos / buffer_size()
-                                        : (-newpos - 1) / buffer_size() - 1;
-            jump(map_node + node_pos);
-            cur = start + newpos - node_pos * buffer_size();
+            int buf_offset = index > 0 ? index / buffer_size()
+                                       : (-index - 1) / buffer_size() - 1;
+            jump(map_node + buf_offset);
+            cur = index - buf_offset * buffer_size() + start;
         }
+        return *this;
     }
 
-    self& operator-=(unsigned int n) { return *this += -n; }
+    self& operator-=(int n) { return *this += -n; }
 
-    self& operator+(unsigned int n) {
+    const self operator+(int n) {
         self tmp = *this;
         return tmp += n;
     }
 
-    self& operator-(unsigned int n) const {
+    const self operator-(int n) const {
         self tmp = *this;
         return tmp += -n;
     }
@@ -140,9 +141,11 @@ class Deque {
     Iterator start, finish;
     unsigned int m_capacity;
     static unsigned int buffer_size() {
-        return _buffer_size(buf_siz, sizeof(T));
+        static int _buf_siz = _buffer_size(buf_siz, sizeof(T));
+        return _buf_siz;
     }
-    void expand_map(unsigned int num_new_node, bool at_front);  //空间扩充算法
+    void expand_map(unsigned int num_new_buf = 1,
+                    bool at_front = false);  //空间扩充算法
 };
 
 template <typename T, unsigned int buf_siz>
@@ -153,7 +156,7 @@ Deque<T, buf_siz>::Deque(unsigned int n)
     m_capacity = num_buf + 2;            //前后各留一个buffer的余量
     if (m_capacity < 8) m_capacity = 8;  //最少8个buffer
     map = new T*[m_capacity];
-    // buffer分配
+    // buffer创建
     T** nstart = map + (m_capacity - num_buf) / 2;  // 元素居中
     T** nfinish = nstart + num_buf - 1;  //当n刚好整除时,nfinish独占一个buffer
     for (T** cur_buf = nstart; cur_buf <= nfinish; ++cur_buf)
@@ -181,26 +184,28 @@ Deque<T, buf_siz>::~Deque() {
 }
 
 template <typename T, unsigned int buf_siz>
-void Deque<T, buf_siz>::expand_map(unsigned int num_new_node, bool at_front) {
-    unsigned int old_size = finish.map_node - start.map_node;
-    unsigned int new_size = old_size + num_new_node;
+void Deque<T, buf_siz>::expand_map(unsigned int num_new_buf, bool at_front) {
+    unsigned int old_size = finish.map_node - start.map_node + 1;
+    //已使用的buffer个数
+    unsigned int new_size = old_size + num_new_buf;
+    //一共需要的buffer个数
     T** new_nstart;
     if (m_capacity > 2 * new_size) {
         /*剩余空间足量,重新布局*/
-        new_nstart = map + (m_capacity - num_new_node) / 2;  //元素居中
-        if (at_front) new_nstart += num_new_node;
+        new_nstart = map + (m_capacity - num_new_buf) / 2;  //元素居中
+        if (at_front) new_nstart += num_new_buf;
 
-        memmove(new_nstart, start, old_size * sizeof(T**));
+        memmove(new_nstart, start.map_node, old_size * sizeof(T**));
     } else {
         /*剩余空间不足*/
         //申请-
-        unsigned int new_capacity = m_capacity + num_new_node + 2;
+        unsigned int new_capacity = m_capacity + num_new_buf + 2;
         T** new_map = new T*[new_capacity];
 
-        new_nstart = new_map + (new_capacity - num_new_node) / 2;
-        if (at_front) new_nstart += num_new_node;
+        new_nstart = new_map + (new_capacity - num_new_buf) / 2;
+        if (at_front) new_nstart += num_new_buf;
         // 拷贝-
-        memmove(new_nstart, start, old_size * sizeof(T**));
+        memmove(new_nstart, start.map_node, old_size * sizeof(T**));
         // 释放-
         delete[] map;
         map = new_map;
@@ -217,7 +222,7 @@ void Deque<T, buf_siz>::push_back(const T& value) {
         ++finish.cur;
     } else {  // map末尾已满
         expand_map(1);
-        *(finish.map_node + 1) = new T*[buffer_size()];
+        *(finish.map_node + 1) = Alloc::allocate(buffer_size());
         finish.jump(finish.map_node + 1);
         finish.cur = finish.start;
         construct(finish.cur, value);

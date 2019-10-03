@@ -4,9 +4,24 @@
 namespace tinySTL {
 
 template <typename T, class Sequence = Deque<T> >
+class Stack;
+
+template <typename T, class Sequence>
+inline bool operator==(const Stack<T, Sequence>& x,
+                       const Stack<T, Sequence>& y) {
+    return x.c == y.c;
+}
+
+template <typename T, class Sequence>
+inline bool operator<(const Stack<T, Sequence>& x,
+                      const Stack<T, Sequence>& y) {
+    return x.c < y.c;
+}
+
+template <typename T, class Sequence>
 class Stack {
-    friend bool operator==<>(const Stack&, const Stack&);
-    friend bool operator<<>(const Stack&, const Stack&);
+    friend bool operator== <>(const Stack&, const Stack&);
+    friend bool operator< <>(const Stack&, const Stack&);
 
    public:
     Stack() {}
@@ -25,17 +40,5 @@ class Stack {
    private:
     Sequence c;
 };
-
-template <typename T, class Sequence>
-inline bool operator==(const Stack<T, Sequence>& x,
-                       const Stack<T, Sequence>& y) {
-    return x.c == y.c;
-}
-
-template <typename T, class Sequence>
-inline bool operator<(const Stack<T, Sequence>& x,
-                      const Stack<T, Sequence>& y) {
-    return x.c < y.c;
-}
 
 }  // namespace tinySTL
