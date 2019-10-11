@@ -1,5 +1,5 @@
 #pragma once
-#include <algorithm>//Ê¹ÓÃSTLÖĞµÄswap()¼°max()
+#include <algorithm>//ä½¿ç”¨STLä¸­çš„swap()åŠmax()
 using namespace std;
 
 template <typename K>
@@ -9,16 +9,16 @@ class RedBlack
     struct RBNode {
 		K key;
         int height;
-        RBColor color; //Ä¬ÈÏĞÂ½ÚµãÑÕÉ«ÎªRED
+        RBColor color; //é»˜è®¤æ–°èŠ‚ç‚¹é¢œè‰²ä¸ºRED
         RBNode *parent, *left, *right;
         RBNode() : parent(nullptr), left(nullptr), right(nullptr), height(0), color(RED) {}
         RBNode(K key, RBNode *parent = nullptr, RBNode *left = nullptr, RBNode *right = nullptr, int height = 0, RBColor color = RED) : key(key), parent(parent), left(left), right(right), height(height), color(color) {}
-        RBNode *uncle(); //·µ»Øµ±Ç°½Úµã¸¸Ç×µÄ¸¸Ç×µÄÁíÒ»¸öº¢×Ó
-        RBNode *succ();  //·µ»Øµ±Ç°½ÚµãµÄÖ±½Óºó¼Ì,²»´æÔÚ·µ»Ønull
+        RBNode *uncle(); //è¿”å›å½“å‰èŠ‚ç‚¹çˆ¶äº²çš„çˆ¶äº²çš„å¦ä¸€ä¸ªå­©å­
+        RBNode *succ();  //è¿”å›å½“å‰èŠ‚ç‚¹çš„ç›´æ¥åç»§,ä¸å­˜åœ¨è¿”å›null
     };
 
 public:
-	struct iterator	{//µ¥Ïòµü´úÆ÷
+	struct iterator	{//å•å‘è¿­ä»£å™¨
 		RBNode* pNode;
 		iterator(RBNode* p = nullptr) :pNode(p) {}
 		iterator& operator=(iterator& x) { pNode = x->pNode; return *this; }
@@ -36,8 +36,8 @@ public:
 	int size() const { return m_size; }
 	void clear() { while (m_size > 0) removeAt(m_root); }
 
-	bool insert(const K &key);		//ÔÚÊ÷ÖĞ²åÈëelem,²åÈë³É¹¦·µ»Øtrue;ÈôelemÒÑ´æÔÚ,·µ»Øfalse
-    bool erase(const K &key);     //ÔÚÊ÷ÖĞÉ¾³ıelem,É¾³ı³É¹¦·µ»Øtrue;Èôelem²»´æÔÚ,·µ»Øfalse
+	bool insert(const K &key);		//åœ¨æ ‘ä¸­æ’å…¥elem,æ’å…¥æˆåŠŸè¿”å›true;è‹¥elemå·²å­˜åœ¨,è¿”å›false
+    bool erase(const K &key);     //åœ¨æ ‘ä¸­åˆ é™¤elem,åˆ é™¤æˆåŠŸè¿”å›true;è‹¥elemä¸å­˜åœ¨,è¿”å›false
 
 	iterator begin() const { RBNode* p = m_root; if (p) while (p->left) p = p->left; return iterator(p); }
 	iterator end() const { return iterator(); }
@@ -49,35 +49,35 @@ private:
 	int m_size;
 	RBNode* m_root;
 	mutable RBNode* m_hot;
-	RBNode*& search(const K& key) const; //ÃüÖĞÔªËØÊ±,·µ»Ø¸ÃÔªËØµÄ¸¸½ÚµãÖ¸Ïò¸ÃÔªËØµÄÖ¸ÕëµÄÒıÓÃ
-									//ÔªËØ²»´æÔÚÊ±,·µ»Ø¸¸½ÚµãÖ¸Ïò¸ÃnullÔªËØµÄÖ¸ÕëµÄÒıÓÃ(Ïàµ±ÓÚ m_hot->left »ò m_hot->right)
-									//(Ê÷Îª¿ÕÊ±,·µ»Øm_rootµÄÒıÓÃ,m_hotÎªnull)
-									//Í¬Ê±¸üĞÂm_hotÎª¸Ã½áµãµÄ¸¸½Úµã
+	RBNode*& search(const K& key) const; //å‘½ä¸­å…ƒç´ æ—¶,è¿”å›è¯¥å…ƒç´ çš„çˆ¶èŠ‚ç‚¹æŒ‡å‘è¯¥å…ƒç´ çš„æŒ‡é’ˆçš„å¼•ç”¨
+									//å…ƒç´ ä¸å­˜åœ¨æ—¶,è¿”å›çˆ¶èŠ‚ç‚¹æŒ‡å‘è¯¥nullå…ƒç´ çš„æŒ‡é’ˆçš„å¼•ç”¨(ç›¸å½“äº m_hot->left æˆ– m_hot->right)
+									//(æ ‘ä¸ºç©ºæ—¶,è¿”å›m_rootçš„å¼•ç”¨,m_hotä¸ºnull)
+									//åŒæ—¶æ›´æ–°m_hotä¸ºè¯¥ç»“ç‚¹çš„çˆ¶èŠ‚ç‚¹
 
-	RBNode* removeAt(RBNode*& rx);       //¹¦ÄÜ:ÔÚÊ÷ÖĞÉ¾³ırxÖ¸ÏòµÄ½Úµã
-												//·µ»Ø:È¡´úrxµÄ½ÚµãÖ¸Õë
-												//¸±×÷ÓÃ:¸üĞÂm_hotÎª¸Ã½áµãµÄ¸¸½Úµã
+	RBNode* removeAt(RBNode*& rx);       //åŠŸèƒ½:åœ¨æ ‘ä¸­åˆ é™¤rxæŒ‡å‘çš„èŠ‚ç‚¹
+												//è¿”å›:å–ä»£rxçš„èŠ‚ç‚¹æŒ‡é’ˆ
+												//å‰¯ä½œç”¨:æ›´æ–°m_hotä¸ºè¯¥ç»“ç‚¹çš„çˆ¶èŠ‚ç‚¹
 
-	int updateHeight(RBNode* x); //¸üĞÂ½ÚµãµÄºÚ¸ß¶È
-								 //¹«Ê½:ºÚ¸ß¶È=max(×óÓÒ½ÚµãºÚ¸ß¶È)+(µ±Ç°ÎªºÚ½Úµã)
+	int updateHeight(RBNode* x); //æ›´æ–°èŠ‚ç‚¹çš„é»‘é«˜åº¦
+								 //å…¬å¼:é»‘é«˜åº¦=max(å·¦å³èŠ‚ç‚¹é»‘é«˜åº¦)+(å½“å‰ä¸ºé»‘èŠ‚ç‚¹)
 	RBNode* zig(RBNode* x);
 	RBNode* zag(RBNode* x);
-	void solveRed(RBNode* x);   //ĞŞ¸´Ë«ºìÈ±Ïİ
-	void solveBlack(RBNode* x); //ĞŞ¸´Ë«ºÚÈ±Ïİ
+	void solveRed(RBNode* x);   //ä¿®å¤åŒçº¢ç¼ºé™·
+	void solveBlack(RBNode* x); //ä¿®å¤åŒé»‘ç¼ºé™·
 };
 
 template <typename K>
 typename RedBlack<K>::RBNode *RedBlack<K>::RBNode::succ()
 {
     RBNode *s = this;
-    if (right) { //ÕÒµ½ÓÒ×ÓÊ÷ÖĞ×î¿¿×óµÄ½Úµã
+    if (right) { //æ‰¾åˆ°å³å­æ ‘ä¸­æœ€é å·¦çš„èŠ‚ç‚¹
         s = right;
         while (s->left)
             s = s->left;
     } else {
         while (s->parent && s->parent->right && s->parent->right == s)
-            s = s->parent; //¾¡¿ÉÄÜÏò×óÉÏ·½ÒÆ¶¯
-        s = s->parent;     //ÏòÓÒÉÏ·½ÒÆ¶¯
+            s = s->parent; //å°½å¯èƒ½å‘å·¦ä¸Šæ–¹ç§»åŠ¨
+        s = s->parent;     //å‘å³ä¸Šæ–¹ç§»åŠ¨
     }
     return s;
 }
@@ -99,8 +99,8 @@ typename RedBlack<K>::RBNode *RedBlack<K>::RBNode::uncle()
 template <typename K>
 int RedBlack<K>::updateHeight(RBNode *x)
 {
-    x->height = max(stature(x->left), stature(x->right)); //Íâ²¿½Úµã=0
-    return (x->color == BLACK ? ++x->height : x->height); //ºÚ½Úµã+1
+    x->height = max(stature(x->left), stature(x->right)); //å¤–éƒ¨èŠ‚ç‚¹=0
+    return (x->color == BLACK ? ++x->height : x->height); //é»‘èŠ‚ç‚¹+1
 }
 
 template <typename K> 
@@ -137,13 +137,13 @@ typename RedBlack<K>::RBNode *RedBlack<K>::zag(RedBlack<K>::RBNode *x) {
 
 template <typename K>
 typename RedBlack<K>::RBNode *&RedBlack<K>::search(const K &rKey) const{
-	if (!m_root || (!(m_root->key < rKey) && !(rKey < m_root->key))) { m_hot = nullptr; return const_cast<RBNode *&>(m_root); }	//µ¥¶À¿¼ÂÇÍË»¯Çé¿ö
+	if (!m_root || (!(m_root->key < rKey) && !(rKey < m_root->key))) { m_hot = nullptr; return const_cast<RBNode *&>(m_root); }	//å•ç‹¬è€ƒè™‘é€€åŒ–æƒ…å†µ
 	m_hot = m_root;
     for (;;){
-        RBNode *&rpx = (rKey < m_hot->key) ? m_hot->left : m_hot->right;	//´Ë´¦Ò»¶¨ÒªÖØĞÂ¶¨Òårp
-        if (!rpx || (!(rKey < rpx->key) && !(rpx->key < rKey))) return rpx; //ÃüÖĞÔªËØÊ±,·µ»Ø¸ÃÔªËØµÄ¸¸½ÚµãÖ¸Ïò¸ÃÔªËØµÄÖ¸ÕëµÄÒıÓÃ
-                                                //²éÕÒÊ§°ÜÊ±(!rpx),·µ»Ø¸¸½ÚµãÖ¸Ïò¸ÃÔªËØ(null)µÄÖ¸ÕëµÄÒıÓÃ(Ïàµ±ÓÚ m_hot->left »ò m_hot->right)
-                                                //(Ê÷Îª¿ÕÊ±,·µ»Øm_rootµÄÒıÓÃ,m_hotÎªnull)
+        RBNode *&rpx = (rKey < m_hot->key) ? m_hot->left : m_hot->right;	//æ­¤å¤„ä¸€å®šè¦é‡æ–°å®šä¹‰rp
+        if (!rpx || (!(rKey < rpx->key) && !(rpx->key < rKey))) return rpx; //å‘½ä¸­å…ƒç´ æ—¶,è¿”å›è¯¥å…ƒç´ çš„çˆ¶èŠ‚ç‚¹æŒ‡å‘è¯¥å…ƒç´ çš„æŒ‡é’ˆçš„å¼•ç”¨
+                                                //æŸ¥æ‰¾å¤±è´¥æ—¶(!rpx),è¿”å›çˆ¶èŠ‚ç‚¹æŒ‡å‘è¯¥å…ƒç´ (null)çš„æŒ‡é’ˆçš„å¼•ç”¨(ç›¸å½“äº m_hot->left æˆ– m_hot->right)
+                                                //(æ ‘ä¸ºç©ºæ—¶,è¿”å›m_rootçš„å¼•ç”¨,m_hotä¸ºnull)
         m_hot = rpx;
     }
 }
@@ -153,28 +153,28 @@ bool RedBlack<K>::insert(const K &key)
 {
     RedBlack<K>::RBNode *&x = search(key);
     if (x) return false;
-    x = new RedBlack<K>::RBNode(key, m_hot, nullptr, nullptr, 0); //(²åÈëÒ»¶¨ÊÇÔÚÍâ²¿½Úµã)
+    x = new RedBlack<K>::RBNode(key, m_hot, nullptr, nullptr, 0); //(æ’å…¥ä¸€å®šæ˜¯åœ¨å¤–éƒ¨èŠ‚ç‚¹)
     m_size++;
     solveRed(x);
     return true;
 }
 
 template <typename K>
-typename RedBlack<K>::RBNode *RedBlack<K>::removeAt(RedBlack<K>::RBNode *&rpx) {  //rxÎªÒıÓÃ±Ø²»Îª¿Õ
+typename RedBlack<K>::RBNode *RedBlack<K>::removeAt(RedBlack<K>::RBNode *&rpx) {  //rxä¸ºå¼•ç”¨å¿…ä¸ä¸ºç©º
     RBNode *x = rpx, *succ = nullptr, *p = x->parent;
-    if (!x->left)       succ = rpx = x->right;//ÎŞ×ó×ÓÊ÷,ÈÃÓÒ×ÓÊ÷(¿ÉÄÜÎªnull)È¡¶ø´úÖ®,(rxÎªÒıÓÃ,¸½´øÉèÖÃÁË×Ó½Úµã)
-    else if (!x->right) succ = rpx = x->left; //ÎŞÓÒ×ÓÊ÷,ÈÃ×ó×ÓÊ÷È¡¶ø´úÖ®,(rxÎªÒıÓÃ,¸½´øÉèÖÃÁË×Ó½Úµã)
+    if (!x->left)       succ = rpx = x->right;//æ— å·¦å­æ ‘,è®©å³å­æ ‘(å¯èƒ½ä¸ºnull)å–è€Œä»£ä¹‹,(rxä¸ºå¼•ç”¨,é™„å¸¦è®¾ç½®äº†å­èŠ‚ç‚¹)
+    else if (!x->right) succ = rpx = x->left; //æ— å³å­æ ‘,è®©å·¦å­æ ‘å–è€Œä»£ä¹‹,(rxä¸ºå¼•ç”¨,é™„å¸¦è®¾ç½®äº†å­èŠ‚ç‚¹)
     else {                          
-        succ = x->succ();           //ÓĞË«×ÓÊ÷,±ØÓĞºó¼Ì
-        swap(x->key, succ->key);  //½»»»xÓëxµÄºó¼Ì,×ª»¯ÎªÎŞ×ó×ÓÊ÷µÄÇé¿ö
+        succ = x->succ();           //æœ‰åŒå­æ ‘,å¿…æœ‰åç»§
+        swap(x->key, succ->key);  //äº¤æ¢xä¸xçš„åç»§,è½¬åŒ–ä¸ºæ— å·¦å­æ ‘çš„æƒ…å†µ
         x = succ;
         p = succ->parent;
         succ = succ->right; 
-        (p == rpx ? p->right : p->left) = succ;  //ÒòÎªxÎ»ÖÃÒÑ¾­±ä»¯,¹ÊÊÖ¶¯ÉèÖÃ×Ó½Úµã
+        (p == rpx ? p->right : p->left) = succ;  //å› ä¸ºxä½ç½®å·²ç»å˜åŒ–,æ•…æ‰‹åŠ¨è®¾ç½®å­èŠ‚ç‚¹
     }
     if (succ) succ->parent = p;
 	delete x; m_size--;
-    m_hot = p;          //¸üĞÂm_hotÎªÉ¾È¥½ÚµãµÄ¸¸Ç×
+    m_hot = p;          //æ›´æ–°m_hotä¸ºåˆ å»èŠ‚ç‚¹çš„çˆ¶äº²
     return succ;
 }
 
@@ -183,24 +183,24 @@ bool RedBlack<K>::erase(const K &key)
 {
     RBNode *&rx = search(key);
     if (!rx) return false;
-    RBNode *r = removeAt(rx);   //rÎªÖ¸ÏòÈ¡´úxÎ»ÖÃµÄ½ÚµãµÄÖ¸Õë,¿ÉÄÜÎªnull
-    if (m_size == 0) return true; //É¾³ıÊ÷ÖĞ×îºóÒ»¸ö½Úµã(ËµÃ÷Ê÷ÖĞÖ»ÓĞ¸ù½Úµã)
-    if (m_hot == nullptr) {     //É¾µôµÄÊÇ¸ù½Úµã(ËµÃ÷Ê÷ÖĞ½öÓĞrootºÍÒ»¸öºì×Ó½Úµã),Ö±½Ó½«rÈ¾³ÉºÚÉ«
+    RBNode *r = removeAt(rx);   //rä¸ºæŒ‡å‘å–ä»£xä½ç½®çš„èŠ‚ç‚¹çš„æŒ‡é’ˆ,å¯èƒ½ä¸ºnull
+    if (m_size == 0) return true; //åˆ é™¤æ ‘ä¸­æœ€åä¸€ä¸ªèŠ‚ç‚¹(è¯´æ˜æ ‘ä¸­åªæœ‰æ ¹èŠ‚ç‚¹)
+    if (m_hot == nullptr) {     //åˆ æ‰çš„æ˜¯æ ¹èŠ‚ç‚¹(è¯´æ˜æ ‘ä¸­ä»…æœ‰rootå’Œä¸€ä¸ªçº¢å­èŠ‚ç‚¹),ç›´æ¥å°†ræŸ“æˆé»‘è‰²
         m_root->color = BLACK;
         updateHeight(m_root);
         return true;
     }
     if ( (stature(m_hot->left) == stature(m_hot->right)) &&
         (m_hot->height == (m_hot->color == BLACK ? stature(m_hot->left) + 1 : stature(m_hot->left)))) {
-        //m_hotµÄºÚ¸ß¶ÈÃ»ÓĞ·¢Éú¸üĞÂ,ºìºÚÊ÷ÒÀ¾ÉÆ½ºâ
+        //m_hotçš„é»‘é«˜åº¦æ²¡æœ‰å‘ç”Ÿæ›´æ–°,çº¢é»‘æ ‘ä¾æ—§å¹³è¡¡
         return true;
     }
-    if (r && r->color == RED){  //ÈôrÎªºìÉ«(¼´xÎªºÚÉ«),²»Î¥·´ºìºÚÊ÷ĞÔÖÊ,½«rÈ¾³ÉºÚÉ«¼´¿É
+    if (r && r->color == RED){  //è‹¥rä¸ºçº¢è‰²(å³xä¸ºé»‘è‰²),ä¸è¿åçº¢é»‘æ ‘æ€§è´¨,å°†ræŸ“æˆé»‘è‰²å³å¯
         r->color = BLACK;
         r->height++;
         return true;
     }
-    /* assert: rÒ»¶¨ÎªºÚÉ«(»òÎªnull), m_hotÖ¸Ïò¸¸½Úµã(±Ø²»Îªnull) */
+    /* assert: rä¸€å®šä¸ºé»‘è‰²(æˆ–ä¸ºnull), m_hotæŒ‡å‘çˆ¶èŠ‚ç‚¹(å¿…ä¸ä¸ºnull) */
     solveBlack(r);
     return true;
 }
@@ -208,24 +208,24 @@ bool RedBlack<K>::erase(const K &key)
 template <typename K>
 void RedBlack<K>::solveRed(RedBlack<K>::RBNode *x)
 {
-    /* 1.²åÈë·¢ÉúÔÚÔÚ¸ù½Úµã
-     *  Ö±½ÓÈ¾³ÉºÚÉ« */
+    /* 1.æ’å…¥å‘ç”Ÿåœ¨åœ¨æ ¹èŠ‚ç‚¹
+     *  ç›´æ¥æŸ“æˆé»‘è‰² */
     if (x->parent == nullptr) {/*x == m_root*/ 
         x->color = BLACK;
         x->height++;
         return;
     }
-    /* 2.²åÈë½ÚµãµÄ¸¸½ÚµãÎªºÚÉ«,²»Î¥·´ºìºÚÊ÷ĞÔÖÊ */
+    /* 2.æ’å…¥èŠ‚ç‚¹çš„çˆ¶èŠ‚ç‚¹ä¸ºé»‘è‰²,ä¸è¿åçº¢é»‘æ ‘æ€§è´¨ */
     RBNode *p = x->parent;
     if (p->color == BLACK) 
 		return;
-    /* 3.²åÈë½ÚµãµÄ¸¸½ÚµãÎªºìÉ«
-     *   ¼ì²é²åÈë½ÚµãµÄuncle½ÚµãÑÕÉ« */
+    /* 3.æ’å…¥èŠ‚ç‚¹çš„çˆ¶èŠ‚ç‚¹ä¸ºçº¢è‰²
+     *   æ£€æŸ¥æ’å…¥èŠ‚ç‚¹çš„uncleèŠ‚ç‚¹é¢œè‰² */
     RBNode *g = p->parent;
     RBNode *u = x->uncle();
 
-    if (!u || u->color == BLACK) {/* 3.1 ²åÈë½ÚµãµÄuncle½ÚµãÑÕÉ«ÎªºÚ(»òÎªÍâ²¿½Úµã),½øĞĞµ÷Õû */
-        if (g->left == p) {	//ÏÂÃæÏÈµ÷ÕûÑÕÉ«ÔÙµ÷ÕûÍØÆË½á¹¹,·ñÔò¸ß¶È¸üĞÂ»á³öÎÊÌâ
+    if (!u || u->color == BLACK) {/* 3.1 æ’å…¥èŠ‚ç‚¹çš„uncleèŠ‚ç‚¹é¢œè‰²ä¸ºé»‘(æˆ–ä¸ºå¤–éƒ¨èŠ‚ç‚¹),è¿›è¡Œè°ƒæ•´ */
+        if (g->left == p) {	//ä¸‹é¢å…ˆè°ƒæ•´é¢œè‰²å†è°ƒæ•´æ‹“æ‰‘ç»“æ„,å¦åˆ™é«˜åº¦æ›´æ–°ä¼šå‡ºé—®é¢˜
             if (p->left == x) {
                 p->color = BLACK;
                 g->color = RED;
@@ -248,7 +248,7 @@ void RedBlack<K>::solveRed(RedBlack<K>::RBNode *x)
                 zag(g);
             }
         }
-    } else {/* 3.2 ²åÈë½ÚµãµÄuncle½ÚµãÑÕÉ«Îªºì */
+    } else {/* 3.2 æ’å…¥èŠ‚ç‚¹çš„uncleèŠ‚ç‚¹é¢œè‰²ä¸ºçº¢ */
 		p->color = BLACK; p->height++;
 		u->color = BLACK; u->height++;
         g->color = RED;
@@ -257,18 +257,18 @@ void RedBlack<K>::solveRed(RedBlack<K>::RBNode *x)
 }
 
 template <typename K> void RedBlack<K>::solveBlack(RBNode *r){
-    /* assert: rÒ»¶¨ÎªºÚÉ«(»òÎªnull), m_hotÖ¸Ïò¸¸½Úµã(±Ø²»Îªnull) */
-    RBNode *p = (r ? r->parent : m_hot);    //1.2.2 Çé¿öµİ¹éµ÷ÓÃÊ±²»ÄÜÊ¹ÓÃm_hot
-    if (!p) return; //É¾È¥µÄÊÇ¸ù½Úµã,Ê÷ÖĞÖ»Ê£xÒ»¸ö½Úµã,²»ĞèÒªµ÷Õû
+    /* assert: rä¸€å®šä¸ºé»‘è‰²(æˆ–ä¸ºnull), m_hotæŒ‡å‘çˆ¶èŠ‚ç‚¹(å¿…ä¸ä¸ºnull) */
+    RBNode *p = (r ? r->parent : m_hot);    //1.2.2 æƒ…å†µé€’å½’è°ƒç”¨æ—¶ä¸èƒ½ä½¿ç”¨m_hot
+    if (!p) return; //åˆ å»çš„æ˜¯æ ¹èŠ‚ç‚¹,æ ‘ä¸­åªå‰©xä¸€ä¸ªèŠ‚ç‚¹,ä¸éœ€è¦è°ƒæ•´
     RBNode *s = (p->left == r) ? p->right : p->left;    //sibiling
-    if (s->color == BLACK) { // 1.±»É¾È¥µÄxµÄĞÖµÜ½Úµã(±Ø¶¨´æÔÚ)ÎªºÚ½Úµã
-        RBNode *t = nullptr;    //Ñ°ÕÒsµÄºìº¢×Ó
+    if (s->color == BLACK) { // 1.è¢«åˆ å»çš„xçš„å…„å¼ŸèŠ‚ç‚¹(å¿…å®šå­˜åœ¨)ä¸ºé»‘èŠ‚ç‚¹
+        RBNode *t = nullptr;    //å¯»æ‰¾sçš„çº¢å­©å­
         if (s->left && s->left->color == RED) t = s->left;
         if (s->right && s->right->color == RED) t = s->right;
-        if (t) {    /* 1.1 ±»É¾È¥µÄxµÄĞÖµÜ½ÚµãÓĞºìº¢×Ó*/
+        if (t) {    /* 1.1 è¢«åˆ å»çš„xçš„å…„å¼ŸèŠ‚ç‚¹æœ‰çº¢å­©å­*/
             RBColor pOld = p->color;
             RBNode *mid = nullptr;
-            if (p->left == s) { //p,s,t½øĞĞ3+4ÖØ¹¹,×óÓÒ½Úµã±äºÚ,ÖĞ¼ä½Úµã±£³ÖÔ­À´pµÄÑÕÉ«
+            if (p->left == s) { //p,s,tè¿›è¡Œ3+4é‡æ„,å·¦å³èŠ‚ç‚¹å˜é»‘,ä¸­é—´èŠ‚ç‚¹ä¿æŒåŸæ¥pçš„é¢œè‰²
                 if (s->left == t) {
                     zig(p);
                     mid = s;
@@ -290,19 +290,19 @@ template <typename K> void RedBlack<K>::solveBlack(RBNode *r){
             if (mid->left) mid->left->color = BLACK;
             if (mid->right) mid->right->color = BLACK;
             mid->color = pOld;
-        } else {    /* 1.2 ±»É¾È¥µÄxµÄĞÖµÜ½ÚµãÃ»ÓĞºìº¢×Ó*/
-            s->color = RED; //s±ä³ÉºìÉ«,ÓëxµÄÉ¾³ıÏàµÖÏû
+        } else {    /* 1.2 è¢«åˆ å»çš„xçš„å…„å¼ŸèŠ‚ç‚¹æ²¡æœ‰çº¢å­©å­*/
+            s->color = RED; //så˜æˆçº¢è‰²,ä¸xçš„åˆ é™¤ç›¸æŠµæ¶ˆ
             s->height--;
-            if (p && p->color == RED) p->color = BLACK; //1.2.1 pÎªºìÉ«->p±ä³ÉºÚÉ«,ĞŞ¸´Íê³É
-            else {  //1.2.2 pÎªºÚÉ«->ºÚ¸ß¶ÈÎó²îÏòÉÏ´«µİ
+            if (p && p->color == RED) p->color = BLACK; //1.2.1 pä¸ºçº¢è‰²->på˜æˆé»‘è‰²,ä¿®å¤å®Œæˆ
+            else {  //1.2.2 pä¸ºé»‘è‰²->é»‘é«˜åº¦è¯¯å·®å‘ä¸Šä¼ é€’
                 p->height--;
                 solveBlack(p);
             }
         }
-    } else {    /* 2.±»É¾È¥µÄxµÄĞÖµÜ½ÚµãÎªºì½Úµã,½»»»sÓëpµÄÎ»ÖÃºÍÑÕÉ« */
+    } else {    /* 2.è¢«åˆ å»çš„xçš„å…„å¼ŸèŠ‚ç‚¹ä¸ºçº¢èŠ‚ç‚¹,äº¤æ¢sä¸pçš„ä½ç½®å’Œé¢œè‰² */
         if (p->left == s) zig(p); else zag(p);
         s->color = BLACK;
         p->color = RED; 
-        solveBlack(r); //ÔÙ´Îµ÷ÓÃsolveBlack,´ËÊ±sibiling½Úµã±ØÎªºÚÉ«
+        solveBlack(r); //å†æ¬¡è°ƒç”¨solveBlack,æ­¤æ—¶sibilingèŠ‚ç‚¹å¿…ä¸ºé»‘è‰²
     }
 }

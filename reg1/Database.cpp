@@ -21,39 +21,39 @@ bool database::Build() {
     int count = 0;
     stu_t elem;
 
-    cout << "Ê×ÏÈÇë½¨Á¢¿¼ÉúÐÅÏ¢ÏµÍ³" << endl;
-    cout << "ÇëÊäÈë¿¼ÉúÈËÊý£º";
+    cout << "é¦–å…ˆè¯·å»ºç«‹è€ƒç”Ÿä¿¡æ¯ç³»ç»Ÿ" << endl;
+    cout << "è¯·è¾“å…¥è€ƒç”Ÿäººæ•°ï¼š";
     cin >> count;
-    cout << "ÇëÒÀ´ÎÊäÈë¿¼ÉúµÄ¿¼ºÅ£¬ÐÕÃû£¬ÐÔ±ð£¬ÄêÁä¼°±¨¿¼Àà±ð£¡" << endl;
+    cout << "è¯·ä¾æ¬¡è¾“å…¥è€ƒç”Ÿçš„è€ƒå·ï¼Œå§“åï¼Œæ€§åˆ«ï¼Œå¹´é¾„åŠæŠ¥è€ƒç±»åˆ«ï¼" << endl;
     for (int i = 0; i < count; i++) {
         cin >> elem;
 		if (!m_student.insert(elem)) {
-			cout << "¿¼ºÅÖØ¸´" << endl;
+			cout << "è€ƒå·é‡å¤" << endl;
 		}
     }
     Print();
-	cout << "ÇëÑ¡ÔñÄúÒª½øÐÐµÄ²Ù×÷£¨1Îª²åÈë£¬2ÎªÉ¾³ý£¬3Îª²éÕÒ£¬4ÎªÐÞ¸Ä£¬5ÎªÍ³¼Æ£¬0ÎªÈ¡Ïû²Ù×÷£©\n\n";
+	cout << "è¯·é€‰æ‹©æ‚¨è¦è¿›è¡Œçš„æ“ä½œï¼ˆ1ä¸ºæ’å…¥ï¼Œ2ä¸ºåˆ é™¤ï¼Œ3ä¸ºæŸ¥æ‰¾ï¼Œ4ä¸ºä¿®æ”¹ï¼Œ5ä¸ºç»Ÿè®¡ï¼Œ0ä¸ºå–æ¶ˆæ“ä½œï¼‰\n\n";
     return true;
 };
 
 bool database::Insert() {
     stu_t elem;
-    /*cout << "ÇëÑ¡ÔñÄúÒª²åÈëµÄ¿¼ÉúµÄÎ»ÖÃ£º";
+    /*cout << "è¯·é€‰æ‹©æ‚¨è¦æ’å…¥çš„è€ƒç”Ÿçš„ä½ç½®ï¼š";
     cin >> index;
 	if (index <= 0) {
-		cout << "Êý×ÖÌ«Ð¡ÁË" << endl;
+		cout << "æ•°å­—å¤ªå°äº†" << endl;
 		return -1;
 	}
 	if (index > m_student.size() + 1) {
-		cout << "Êý×ÖÌ«´óÁË" << endl;
+		cout << "æ•°å­—å¤ªå¤§äº†" << endl;
 		return -1;
 	}
     */
-    cout << "ÇëÒÀ´ÎÊäÈëÒª²åÈëµÄ¿¼ÉúµÄ¿¼ºÅ£¬ÐÕÃû£¬ÐÔ±ð£¬ÄêÁä¼°±¨¿¼Àà±ð£¡" << endl;
+    cout << "è¯·ä¾æ¬¡è¾“å…¥è¦æ’å…¥çš„è€ƒç”Ÿçš„è€ƒå·ï¼Œå§“åï¼Œæ€§åˆ«ï¼Œå¹´é¾„åŠæŠ¥è€ƒç±»åˆ«ï¼" << endl;
     cin >> elem;
     if (!m_student.insert(elem))
     {
-        cout << "Ñ§ºÅÖØ¸´,Çë¼ì²éÊäÈëÊý¾Ý" << endl;
+        cout << "å­¦å·é‡å¤,è¯·æ£€æŸ¥è¾“å…¥æ•°æ®" << endl;
 	return false;
     }
     return true;
@@ -61,53 +61,53 @@ bool database::Insert() {
 
 bool database::Remove() {
     stu_t elem; 
-    cout << "ÇëÑ¡ÔñÄúÒªÉ¾³ýµÄ¿¼ÉúµÄ¿¼ºÅ£º";
+    cout << "è¯·é€‰æ‹©æ‚¨è¦åˆ é™¤çš„è€ƒç”Ÿçš„è€ƒå·ï¼š";
     cin >> elem.id;
 	auto it = m_student.find(elem);
     if (it == m_student.end()) {
-        cout << "ÕÒ²»µ½¿¼ºÅÎª" << elem.id << "µÄ¿¼Éú" << endl;
+        cout << "æ‰¾ä¸åˆ°è€ƒå·ä¸º" << elem.id << "çš„è€ƒç”Ÿ" << endl;
         return false;
     }
-    cout << "ÄúÉ¾³ýµÄ¿¼ÉúÐÅÏ¢ÊÇ£º" << *it << endl;
-	m_student.erase(it);//Ê¹ÓÃµü´úÆ÷É¾³ý
+    cout << "æ‚¨åˆ é™¤çš„è€ƒç”Ÿä¿¡æ¯æ˜¯ï¼š" << *it << endl;
+	m_student.erase(it);//ä½¿ç”¨è¿­ä»£å™¨åˆ é™¤
     return true;
 }
 
 bool database::Search() const {
     stu_t elem;
-    cout << "ÇëÑ¡ÔñÄúÒª²éÕÒµÄ¿¼ÉúµÄ¿¼ºÅ£º";
+    cout << "è¯·é€‰æ‹©æ‚¨è¦æŸ¥æ‰¾çš„è€ƒç”Ÿçš„è€ƒå·ï¼š";
     cin >> elem.id;
 	auto it = m_student.find(elem);
 	if (it == m_student.end()) {
-		cout << "ÕÒ²»µ½¿¼ºÅÎª" << elem.id << "µÄ¿¼Éú" << endl;
+		cout << "æ‰¾ä¸åˆ°è€ƒå·ä¸º" << elem.id << "çš„è€ƒç”Ÿ" << endl;
 		return false;
 	}
-    cout << "¿¼ºÅ      ÐÕÃû      ÐÔ±ð      ÄêÁä      ±¨¿¼Àà±ð  " << endl;
+    cout << "è€ƒå·      å§“å      æ€§åˆ«      å¹´é¾„      æŠ¥è€ƒç±»åˆ«  " << endl;
     cout << *it << endl;
     return true;
 }
 
 bool database::Update() {
     stu_t elem;
-    cout << "ÇëÑ¡ÔñÄúÒªÐÞ¸ÄµÄ¿¼ÉúµÄ¿¼ºÅ£º";
+    cout << "è¯·é€‰æ‹©æ‚¨è¦ä¿®æ”¹çš„è€ƒç”Ÿçš„è€ƒå·ï¼š";
     cin >> elem.id;
 	if (!m_student.erase(elem)) {
-		cout << "ÕÒ²»µ½¿¼ºÅÎª" << elem.id << "µÄ¿¼Éú" << endl;
+		cout << "æ‰¾ä¸åˆ°è€ƒå·ä¸º" << elem.id << "çš„è€ƒç”Ÿ" << endl;
 		return false;
 	}
-    cout << "ÇëÒÀ´ÎÊäÈëÒªÐÞ¸ÄµÄ¿¼ÉúµÄ¿¼ºÅ£¬ÐÕÃû£¬ÐÔ±ð£¬ÄêÁä¼°±¨¿¼Àà±ð£¡" << endl;
+    cout << "è¯·ä¾æ¬¡è¾“å…¥è¦ä¿®æ”¹çš„è€ƒç”Ÿçš„è€ƒå·ï¼Œå§“åï¼Œæ€§åˆ«ï¼Œå¹´é¾„åŠæŠ¥è€ƒç±»åˆ«ï¼" << endl;
     cin >> elem;
 	m_student.insert(elem);
     return true;
 }
 
 void database::Stat() const {
-    cout << "µ±Ç°ÏµÍ³ÄÚÒ»¹²ÓÐ " << m_student.size() << " Ãû¿¼Éú" << endl;
+    cout << "å½“å‰ç³»ç»Ÿå†…ä¸€å…±æœ‰ " << m_student.size() << " åè€ƒç”Ÿ" << endl;
 }
 
 void database::Print() const {
 	cout << endl;
-	cout << "¿¼ºÅ      ÐÕÃû      ÐÔ±ð      ÄêÁä      ±¨¿¼Àà±ð  " << endl;
+	cout << "è€ƒå·      å§“å      æ€§åˆ«      å¹´é¾„      æŠ¥è€ƒç±»åˆ«  " << endl;
     for (auto it = m_student.begin(); it != m_student.end(); ++it){
 	cout << *it << endl;
     }
@@ -115,7 +115,7 @@ void database::Print() const {
 
 bool database::Loop() {
     string operation;
-    cout << "ÇëÑ¡ÔñÄúÒª½øÐÐµÄ²Ù×÷£º";
+    cout << "è¯·é€‰æ‹©æ‚¨è¦è¿›è¡Œçš„æ“ä½œï¼š";
     cin >> operation;
     switch (operation[0]) {
         case '0':
@@ -136,14 +136,14 @@ bool database::Loop() {
             Stat();
             break;
         default:
-			cout << "Î´Öª²Ù×÷,ÇëÖØÐÂÊäÈë" << endl;
-			cout << "ÊäÈëÌáÊ¾: 1Îª²åÈë£¬2ÎªÉ¾³ý£¬3Îª²éÕÒ£¬4ÎªÐÞ¸Ä£¬5ÎªÍ³¼Æ£¬0ÎªÈ¡Ïû²Ù×÷" << endl;
+			cout << "æœªçŸ¥æ“ä½œ,è¯·é‡æ–°è¾“å…¥" << endl;
+			cout << "è¾“å…¥æç¤º: 1ä¸ºæ’å…¥ï¼Œ2ä¸ºåˆ é™¤ï¼Œ3ä¸ºæŸ¥æ‰¾ï¼Œ4ä¸ºä¿®æ”¹ï¼Œ5ä¸ºç»Ÿè®¡ï¼Œ0ä¸ºå–æ¶ˆæ“ä½œ" << endl;
 			break;
     }
     Print();
     return true;
 }
 /*
-1234 a ÄÐ 1 aaa    8782 b Å® 2 bbb    5314 c ÄÐ 3 ccc    2456 d ÄÐ 1 ddd    7253 e Å® 2 eee    9432 f ÄÐ 3 fff
+1234 a ç”· 1 aaa    8782 b å¥³ 2 bbb    5314 c ç”· 3 ccc    2456 d ç”· 1 ddd    7253 e å¥³ 2 eee    9432 f ç”· 3 fff
 
 */
