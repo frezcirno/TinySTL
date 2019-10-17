@@ -8,3 +8,5 @@ tinySTL/test
 tinySTL/Deque
 tinySTL/Vector
 tinySTL/test.cpp
+calc4/test
+calc4/testcase.cpp

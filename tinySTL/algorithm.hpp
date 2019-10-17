@@ -1,9 +1,13 @@
 #pragma once
+#include <algorithm>
 
-namespace tinySTL {
+namespace tinySTL
+{
 template <class Iter>
-Iter copy(Iter start, Iter end, Iter dst) {
-    while (start != end) {
+Iter copy(Iter start, Iter end, Iter dst)
+{
+    while (start != end)
+    {
         *dst = *start;
         ++start;
         ++dst;
@@ -12,8 +16,10 @@ Iter copy(Iter start, Iter end, Iter dst) {
 }
 
 template <class Iter>
-Iter copy_backward(Iter start, Iter end, Iter dst_end) {
-    do {
+Iter copy_backward(Iter start, Iter end, Iter dst_end)
+{
+    do
+    {
         --dst_end;
         --end;
         *dst_end = *end;
@@ -22,11 +28,13 @@ Iter copy_backward(Iter start, Iter end, Iter dst_end) {
 }
 
 template <typename T, class Iter>
-void fill(Iter start, Iter end, const T& value) {
-    while (start != end) {
+void fill(Iter start, Iter end, const T &value)
+{
+    while (start != end)
+    {
         *start = value;
         ++start;
     }
 }
 
-}  // namespace tinySTL
+} // namespace tinySTL

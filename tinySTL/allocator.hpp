@@ -21,7 +21,10 @@ inline void destroy(T* p) {
 
 template <typename T>
 void destroy(T* begin, T* end) {
-    for (T* cur = begin; cur < end; cur++) cur->~T();
+    while (begin != end) {
+        begin->~T();
+        ++begin;
+    }
 }
 
 //以x为初始值在[begin,end)范围内构造元素
