@@ -1,10 +1,8 @@
 #pragma once
-#include <algorithm>
-
 namespace tinySTL
 {
-template <class Iter>
-Iter copy(Iter start, Iter end, Iter dst)
+template <class Iter, class Iter2>
+Iter2 copy(Iter start, Iter end, Iter2 dst)
 {
     while (start != end)
     {
@@ -15,8 +13,8 @@ Iter copy(Iter start, Iter end, Iter dst)
     return dst;
 }
 
-template <class Iter>
-Iter copy_backward(Iter start, Iter end, Iter dst_end)
+template <class Iter, class Iter2>
+Iter2 copy_backward(Iter start, Iter end, Iter2 dst_end)
 {
     do
     {

@@ -199,8 +199,8 @@ deque<T, buf_siz>::deque(unsigned int n, const T &value) : deque(n)
 {
     //元素构造
     for (T **cur_buf = _start.map_node; cur_buf < _finish.map_node; ++cur_buf)
-        construct_n(*cur_buf, buffer_size(), value);
-    construct_range(_finish._start, _finish.cur, value);
+        uninitialized_fill_n(*cur_buf, buffer_size(), value);
+    uninitialized_fill(_finish._start, _finish.cur, value);
 }
 
 template <typename T, unsigned int buf_siz>
