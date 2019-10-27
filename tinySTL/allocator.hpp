@@ -8,10 +8,12 @@ class allocator
 {
 public:
     typedef T value_type;
-    typedef T *pointer;
-    typedef T &reference;
+    typedef value_type *pointer;
+    typedef value_type &reference;
+    typedef const value_type *const_pointer;
+    typedef const value_type &const_reference;
     typedef size_t size_type;
-    typedef const T &const_reference;
+    typedef ptrdiff_t diff_type;
 
     //空间分配
     static pointer allocate(size_type n = 1)
@@ -21,17 +23,43 @@ public:
             throw "::operator new error!";
         return space;
     };
-    static void deallocate(pointer p) { ::operator delete[](p); };
+    static void deallocate(pointer p) { ::operator delete(p); };
 
     //取地址
     static pointer address(reference x) { return (pointer)&x; }
+};
+
+//阻止类型
+template <typename T>
+class allocator<const T>
+{
+public:
+    typedef T value_type;
+};
+
+template <typename T>
+class allocator<volatile T>
+{
+public:
+    typedef T value_type;
+};
+
+template <typename T>
+class allocator<const volatile T>
+{
+public:
+    typedef T value_type;
 };
 
 template <>
 class allocator<void>
 {
 public:
+    typedef void value_type;
     typedef void *pointer;
+    typedef const void *const_pointer;
+    typedef size_t size_type;
+    typedef ptrdiff_t difference_type;
 };
 
 } // namespace tinySTL

@@ -1,10 +1,9 @@
 #pragma once
-/**
- * 双向循环链表
- * 类STL<list>接口
- * 简化版本
- */
 #include "allocator.hpp"
+#include "uninitialized.hpp"
+#include "type_traits.hpp"
+#include "construct.hpp"
+
 namespace tinySTL
 {
 
@@ -25,215 +24,282 @@ class _list_iterator
 {
 public:
     typedef T value_type;
-    typedef _list_node<T> *link_t;
+    typedef T *pointer;
+    typedef T &reference;
+
     typedef _list_iterator<T> self;
+    typedef _list_node<T> node_t;
+    typedef node_t *link_t;
     friend class list<T>;
 
 private:
     link_t _node;
 
 public:
-    //构造、析构
-    _list_iterator() {}
+    _list_iterator() {} //构造
     // _list_iterator(link_t node) : _node(node) {}
     _list_iterator(const link_t node) : _node(node) {}
-    _list_iterator(const _list_iterator &rhs) : _node(rhs._node) {}
-    ~_list_iterator() {}
+    _list_iterator(const _list_iterator &rhs) : _node(rhs._node) {} //复制
     self &operator=(const self &rhs)
     {
         this->_node = rhs._node;
         return *this;
     }
+    ~_list_iterator() {} //析构
+    reference &operator*() { return _node->_data; }
+    pointer operator->() { return &(operator*()); }
 
     self &operator++()
     {
         _node = _node->_next;
         return *this;
     }
-
     self &operator--()
     {
         _node = _node->_prev;
         return *this;
     }
-
-    const self operator++(int)
+    self operator++(int)
     {
         self old(*this);
         ++*this;
         return old;
     }
-
-    const self operator--(int)
+    self operator--(int)
     {
         self old(*this);
         --*this;
         return old;
     }
-
-    bool operator==(const self &rhs) const { return _node == rhs._node; }
-    bool operator!=(const self &rhs) const { return _node != rhs._node; }
-    T &operator*() { return _node->_data; }
-    T *operator->() { return &(operator*()); }
+    friend bool operator==(const self &lhs, const self &rhs) { return lhs._node == rhs._node; }
+    friend bool operator!=(const self &lhs, const self &rhs) { return lhs._node != rhs._node; }
 };
 
 template <typename T>
 class list
 {
 public:
+    typedef allocator<T> Alloc;
+
+    typedef size_t size_type;
+    typedef ptrdiff_t diff_type;
+    typedef T value_type;
+    typedef typename Alloc::pointer pointer;
+    typedef typename Alloc::const_pointer const_pointer;
+    typedef typename Alloc::reference reference;
+    typedef typename Alloc::const_reference const_reference;
+
     typedef _list_node<T> node_type;
+    typedef node_type *node_pointer;
+    typedef allocator<node_type> node_alloc;
+
     typedef _list_iterator<T> iterator;
-    typedef const _list_iterator<T> const_iterator;
+    typedef _list_iterator<const T> const_iterator;
+
+    typedef list<T> self;
+
+private:
+    node_pointer create_node(const_reference value){
+        node_pointer ptr= node_alloc::allocate();
+        construct(ptr,value);
+        return ptr;
+    }
+    void delete_node(node_pointer ptr){
+        destroy(ptr);
+        node_alloc::deallocate(ptr);
+    }
 
 public:
     //构造、析构、复制、初始化
     list();
-    explicit list(int count, const T &value);
-    list(const list<T> &other);
+    explicit list(size_type count, const_reference value) : list() { assign(count, value); }
+    template <class Iter>
+    list(Iter begin, Iter end) : list() { assign(begin, end); }
+    list(const self &other) : list() { assign(other.begin(), other.end()); }
+    self &operator=(const self &other)
+    {
+        assign(other.begin(), other.end());
+        return *this;
+    }
     ~list()
     {
         clear();
-        allocator<node_type>::deallocate(_entry);
+        node_alloc::deallocate(_entry); //_entry只分配内存不构造元素
     }
-    list<T> &operator=(const list<T> &other);
-    void assign(iterator begin, iterator end);
-    void assign(int count, const T &value);
+
+    template <class Iter>
+    void assign(Iter begin, Iter end);
+    void assign(size_type count, const_reference value);
 
     //元素访问
-    T &front() { return *begin(); }
-    T &back() { return *end()->_prev; }
+    reference front() { return *begin(); }
+    reference back() { return *end()->_prev; }
 
     //迭代器
     iterator begin() { return iterator(_entry->_next); }
     iterator end() { return iterator(_entry); }
-    const_iterator begin() const { return iterator(_entry->_next); }
-    const_iterator end() const { return iterator(_entry); }
+    const_iterator begin() const { return const_iterator(_entry->_next); }
+    const_iterator end() const { return const_iterator(_entry); }
 
     //容量
     bool empty() { return _size == 0; }
-    int size() { return _size; }
+    size_type size() { return _size; }
 
     //修改器
     void clear();
-    iterator insert(iterator pos, const T &value);
-    iterator insert(iterator pos, unsigned int count, const T &value);
+    iterator insert(iterator pos, const_reference value);
+    iterator insert(iterator pos, size_type count, const_reference value);
+    template <class Iter>
+    iterator insert(iterator pos, Iter begin, Iter end);
     iterator erase(iterator pos);
-    void push_back(const T &value) { insert(end(), value); }
-    void pop_back() { erase(--end()); }
-    void push_front(const T &value) { insert(begin(), value); }
+    iterator erase(iterator begin, iterator end);
+
+    void push_back(const_reference value) { insert(end(), value); }
+    void pop_back() { iterator tmp = end(); erase(--tmp); }
+    void push_front(const_reference value) { insert(begin(), value); }
     void pop_front() { erase(begin()); }
 
     //操作
-    void remove(const T &value);
+    void remove(const_reference value);
 
 private:
-    node_type *_entry; //由于是双向循环链表,仅需一个节点即可表示整个链表
-    int _size;
+    node_pointer _entry; //由于是双向循环链表,仅需一个节点即可表示整个链表
+    size_type _size;
 };
 
 template <typename T>
 inline list<T>::list() : _size(0)
 {
-    _entry = allocator<node_type>::allocate(); //附加节点: 只分配空间,不构造元素
+    _entry = node_alloc::allocate(); //附加节点: 只分配空间,不构造元素
     _entry->_next = _entry->_prev = _entry;
 }
 
 template <typename T>
-inline typename list<T>::iterator list<T>::insert(iterator pos,
-                                                  const T &value)
+inline typename list<T>::iterator list<T>::insert(iterator pos, const_reference value)
 {
-    node_type *ret = new node_type(value);
+    ++_size;
+    node_pointer ret = create_node(value);
     ret->_prev = pos._node->_prev;
     ret->_next = pos._node;
     pos._node->_prev->_next = ret;
     pos._node->_prev = ret;
-    ++_size;
     return ret;
 }
+
 template <typename T>
-inline typename list<T>::iterator list<T>::insert(iterator pos,
-                                                  unsigned int count,
-                                                  const T &value)
+template <class Iter>
+typename list<T>::iterator list<T>::insert(iterator pos, Iter start, Iter finish)
 {
-    while (--count)
-        insert(pos, value);
+    _size += (finish - start);
+    node_pointer newnode = pos._node->_prev;
+    while (start != finish)
+    {
+        newnode->_next = create_node(*start);
+        newnode->_next->_prev = newnode;
+        newnode = newnode->_next;
+        ++start;
+    }
+    newnode->_next = pos._node;
+    pos._node->_prev = newnode;
+    return pos;
+}
+
+template <typename T>
+typename list<T>::iterator list<T>::insert(iterator pos, size_type count, const_reference value)
+{
+    _size += count;
+    node_pointer newnode = pos._node->_prev;
+    while (count > 0)
+    {
+        newnode->_next = create_node(value);
+        newnode->_next->_prev = newnode;
+        newnode = newnode->_next;
+        --count;
+    }
+    newnode->_next = pos._node;
+    pos._node->_prev = newnode;
 }
 
 template <typename T>
 inline typename list<T>::iterator list<T>::erase(iterator pos)
 {
-    node_type *ret = pos._node->_next;
+    --_size;
+    node_pointer ret = pos._node->_next;
     pos._node->_prev->_next = pos._node->_next;
     pos._node->_next->_prev = pos._node->_prev;
-    delete pos._node;
-    --_size;
-    return ret;
+    delete_node(pos._node);
+    return iterator(ret);
+}
+
+template <typename T>
+inline typename list<T>::iterator list<T>::erase(iterator start, iterator finish)
+{
+    iterator begin1 = start; --begin1;
+    begin1._node->_next = finish._node;
+    finish._node->_prev = begin1._node;
+    while (start != finish)
+    {
+        --_size;
+        node_pointer tmp = start._node;
+        ++start;
+        destroy(tmp);
+        node_alloc::deallocate(tmp);
+    }
+    return finish;
 }
 
 template <typename T>
 inline void list<T>::clear()
 {
-    node_type *cur = _entry->_next;
-    while (cur != _entry)
+    _size = 0;
+    iterator cur = begin();
+    while (cur != end())
     {
-        delete cur;
-        cur = cur->_next;
+        node_pointer tmp = cur._node;
+        ++cur;
+        delete_node(tmp);
     }
     _entry->_next = _entry;
     _entry->_prev = _entry;
-    _size = 0;
 }
 
 template <typename T>
-inline list<T>::list(int count, const T &value) : list()
+template <class Iter>
+void list<T>::assign(Iter start, Iter finish)
 {
-    while (--count)
-        this->push_back(value);
+    iterator cur = begin();
+    for (; cur != end() && start != finish; ++cur, ++start)
+        *cur = *start; //替换已存在节点
+    if (start != finish)
+        insert(end(), start, finish); //新节点个数多于原来节点个数,添加之
+    else
+        erase(cur, end()); //新节点个数少于或等于原来节点个数,删除之
 }
 
 template <typename T>
-inline list<T>::list(const list<T> &other) : list()
+void list<T>::assign(size_type count, const_reference value)
 {
-    assign(other.begin(), other.end());
+    iterator cur = begin();
+    for (; cur != end() && count > 0; ++cur, --count)
+        *cur = value;
+    if (count > 0)
+        insert(end(), count, value); //新节点个数多于原来节点个数,添加之
+    else
+        erase(cur, end()); //新节点个数少于或等于原来节点个数,删除之
 }
 
 template <typename T>
-inline list<T> &list<T>::operator=(const list<T> &other)
-{
-    assign(other.begin(), other.end());
-    return *this;
-}
-
-template <typename T>
-void list<T>::assign(iterator begin, iterator end)
-{
-    clear();
-    while (begin != end)
-    {
-        push_back(*begin);
-        ++begin;
-    }
-}
-
-template <typename T>
-void list<T>::assign(int count, const T &value)
-{
-    clear();
-    while (--count)
-        push_back(value);
-}
-
-template <typename T>
-void list<T>::remove(const T &value)
+void list<T>::remove(const_reference value)
 {
     for (iterator cur = begin(); cur != end();)
     {
-        iterator p = cur;
-        ++cur;
-        if (*p == value)
+        if (*cur != value)
+            ++cur;
+        else
         {
+            iterator p = cur;
+            ++cur;
             erase(p);
-            --_size;
         }
     }
 }

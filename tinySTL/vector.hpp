@@ -1,25 +1,30 @@
 #pragma once
-#include "allocator.hpp"
+// #include "allocator.hpp"
 #include "uninitialized.hpp"
 #include "algorithm.hpp"
 #include "iterator.hpp"
 namespace tinySTL
 {
 
-template <typename T>
+template <typename T>//T 不能是const, volatile类型
 class vector
 {
 public:
+    typedef allocator<T> Alloc;
+    
+    typedef size_t size_type;
+    typedef ptrdiff_t diff_type;
     typedef T value_type;
-    typedef T *pointer;
-    typedef T &reference;
-    typedef size_t diff_type;
-    typedef const T &const_reference;
+    typedef typename Alloc::pointer pointer;
+    typedef typename Alloc::reference reference;
+    typedef typename Alloc::const_pointer const_pointer;
+    typedef typename Alloc::const_reference const_reference;
 
-    typedef pointer_iterator<pointer> iterator;
-    typedef pointer_iterator<const T *> const_iterator; //只读迭代器,而非迭代器不可变
+    // typedef pointer_iterator<pointer> iterator;
+    // typedef pointer_iterator<const_pointer> const_iterator; //只读迭代器,而非迭代器不可变
+    typedef pointer iterator;
+    typedef const_pointer const_iterator; //只读迭代器,而非迭代器不可变
 
-    typedef allocator<value_type> Alloc;
 
 private:
     pointer _element;
@@ -30,14 +35,16 @@ private:
 public:
     //构造、析构、赋值
     vector();
-    ~vector();
     explicit vector(diff_type count, const_reference value);
+    template <class Iter>
+    vector(Iter begin, Iter end) : vector() { assign(begin, end); }
     vector(const vector &other);                 //拷贝构造函数
     vector<T> &operator=(const vector<T> &other) //拷贝赋值运算符
     {
         assign(other.begin(), other.end());
         return *this;
     }
+    ~vector();
 
     void assign(diff_type count, const_reference value);
     template <class Iter>
@@ -66,7 +73,7 @@ public:
     //容量
     bool empty() const { return (_element == _finish); }
     diff_type size() const { return (_finish - _element); }
-    int capacity() const { return (_end - _element); }
+    size_type capacity() const { return (_end - _element); }
 
     //修改器
     void clear();
@@ -81,8 +88,7 @@ public:
 template <typename T>
 inline vector<T>::vector()
 {
-    _element = Alloc::allocate(10);
-    _finish = _element;
+    _finish = _element = Alloc::allocate(10);
     _end = _element + 10;
 }
 
@@ -105,6 +111,7 @@ inline vector<T>::~vector()
 {
     clear();
     Alloc::deallocate(_element);
+    _end = _finish = _element = nullptr;
 }
 
 template <typename T>
@@ -174,21 +181,21 @@ void vector<T>::insert(iterator pos, diff_type count, const_reference value)
         return;
     if (_finish + count < _end) /*空间尚且足够*/
     {
-        diff_type num_elem_after = _finish - pos;
+        diff_type num_elem_after = end() - pos;
         pointer old_end = _finish;
         if (num_elem_after > count) /*新插入元素个数少于后面的元素个数*/
         {
             //构造在vector末尾新增的count个元素(以原来的结尾为蓝本)
             _finish = uninitialized_copy(old_end - count, old_end, old_end);
             //拷贝[pos+count,end-count)的元素
-            copy_backward(pos, old_end - count, old_end);
+            copy_backward(pos/*.base()*/, old_end - count, old_end);
             fill_n(pos, count, value);
         }
-        else /*新插入元素个数较多*/
+        else /*新插入元素个数较多, count > num_elem_after */
         {
             uninitialized_fill_n(old_end, count - num_elem_after, value);
-            _finish = uninitialized_copy(pos, old_end, pos + count);
-            fill(pos, old_end, value);
+            _finish = uninitialized_copy(pos/*.base()*/, old_end, pos/*.base()*/ + count);
+            fill(pos/*.base()*/, old_end, value);
         }
     }
     else /*空间不足*/
@@ -196,9 +203,9 @@ void vector<T>::insert(iterator pos, diff_type count, const_reference value)
         diff_type newCapacity = (_finish - _element) + count;
         pointer newSpace = Alloc::allocate(newCapacity);
         pointer finish;
-        finish = uninitialized_copy(_element, pos, newSpace);
+        finish = uninitialized_copy(_element, pos/*.base()*/, newSpace);
         finish = uninitialized_fill_n(finish, count, value); //构造count个value
-        finish = uninitialized_copy(pos, _finish, finish);
+        finish = uninitialized_copy(pos/*.base()*/, _finish, finish);
         destroy(_element, _finish);
         Alloc::deallocate(_element);
         _element = newSpace;
@@ -266,12 +273,14 @@ void vector<T>::push_back(const_reference value)
 {
     if (_finish == _end)
     {
-        pointer newelem = Alloc::allocate((_end - _element) * 3 / 2);
-        pointer newfinish = uninitialized_copy(_element, _end, newelem);
+        size_t new_cap = capacity() * 3 / 2;
+        pointer newelem = Alloc::allocate(new_cap);
+        pointer newfinish = uninitialized_copy(_element, _finish, newelem);
         destroy(_element, _finish);
         Alloc::deallocate(_element);
         _element = newelem;
         _finish = newfinish;
+        _end = _element + new_cap;
     }
     construct(_finish++, value);
 }

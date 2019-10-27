@@ -32,83 +32,25 @@ struct iterator_traits<const T *>
 };
 
 //type_traits
-struct __true
-{
-};
-struct __false
-{
-};
+#define EMPTY_STRUCT {}
+struct __true EMPTY_STRUCT;
+struct __false EMPTY_STRUCT;
 
-template <typename T>
-struct type_traits
-{
-    typedef __false is_POD;
-};
+template <typename T> struct type_traits{    typedef __false is_POD;  };
 
-template <>
-struct type_traits<char>
-{
-    typedef __true is_POD;
-};
-template <>
-struct type_traits<signed char>
-{
-    typedef __true is_POD;
-};
-template <>
-struct type_traits<unsigned char>
-{
-    typedef __true is_POD;
-};
-template <>
-struct type_traits<short>
-{
-    typedef __true is_POD;
-};
-template <>
-struct type_traits<unsigned short>
-{
-    typedef __true is_POD;
-};
-template <>
-struct type_traits<int>
-{
-    typedef __true is_POD;
-};
-template <>
-struct type_traits<unsigned int>
-{
-    typedef __true is_POD;
-};
-template <>
-struct type_traits<long>
-{
-    typedef __true is_POD;
-};
-template <>
-struct type_traits<unsigned long>
-{
-    typedef __true is_POD;
-};
-template <>
-struct type_traits<float>
-{
-    typedef __true is_POD;
-};
-template <>
-struct type_traits<double>
-{
-    typedef __true is_POD;
-};
-template <>
-struct type_traits<long double>
-{
-    typedef __true is_POD;
-};
-template <typename T>
-struct type_traits<T *>
-{
-    typedef __true is_POD;
-};
+template <> struct type_traits<char>{           typedef __true is_POD;  };
+template <> struct type_traits<signed char>{    typedef __true is_POD;};
+template <> struct type_traits<unsigned char>{  typedef __true is_POD;};
+template <> struct type_traits<short>{          typedef __true is_POD;};
+template <> struct type_traits<unsigned short>{ typedef __true is_POD;};
+template <> struct type_traits<int>{            typedef __true is_POD;};
+template <> struct type_traits<unsigned int>{   typedef __true is_POD;};
+template <> struct type_traits<long>{           typedef __true is_POD;};
+template <> struct type_traits<unsigned long>{  typedef __true is_POD;};
+template <> struct type_traits<float>{          typedef __true is_POD;};
+template <> struct type_traits<double>{         typedef __true is_POD;};
+template <> struct type_traits<long double>{    typedef __true is_POD;};
+template <typename T> struct type_traits<T *>{  typedef __true is_POD;};
+
 
 } // namespace tinySTL
