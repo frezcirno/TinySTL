@@ -24,22 +24,24 @@ class _list_iterator
 {
 public:
     typedef T value_type;
-    typedef T *pointer;
-    typedef T &reference;
+    typedef value_type *pointer;
+    typedef value_type &reference;
+    typedef int diff_type;
 
-    typedef _list_iterator<T> self;
-    typedef _list_node<T> node_t;
-    typedef node_t *link_t;
-    friend class list<T>;
+    typedef _list_iterator<value_type> self;
+
+    typedef _list_node<value_type> node_type;
+    typedef node_type *link_type;
+    friend class list<value_type>;
 
 private:
-    link_t _node;
+    link_type _node;
 
 public:
     _list_iterator() {} //构造
-    // _list_iterator(link_t node) : _node(node) {}
-    _list_iterator(const link_t node) : _node(node) {}
-    _list_iterator(const _list_iterator &rhs) : _node(rhs._node) {} //复制
+    _list_iterator(link_type node) : _node(node) /*默认复制构造*/ {}
+    _list_iterator(const self &rhs) : _node(rhs._node) {} //复制
+
     self &operator=(const self &rhs)
     {
         this->_node = rhs._node;
@@ -71,10 +73,12 @@ public:
         --*this;
         return old;
     }
+    // diff_type operator-(const self &rhs); //迭代器减法
     friend bool operator==(const self &lhs, const self &rhs) { return lhs._node == rhs._node; }
     friend bool operator!=(const self &lhs, const self &rhs) { return lhs._node != rhs._node; }
 };
 
+//T 必须不能是const类型
 template <typename T>
 class list
 {
@@ -94,17 +98,19 @@ public:
     typedef allocator<node_type> node_alloc;
 
     typedef _list_iterator<T> iterator;
-    typedef _list_iterator<const T> const_iterator;
+    // typedef _list_iterator<const T> const_iterator;
 
     typedef list<T> self;
 
 private:
-    node_pointer create_node(const_reference value){
-        node_pointer ptr= node_alloc::allocate();
-        construct(ptr,value);
+    node_pointer create_node(const_reference value)
+    {
+        node_pointer ptr = node_alloc::allocate();
+        construct(ptr, value);
         return ptr;
     }
-    void delete_node(node_pointer ptr){
+    void delete_node(node_pointer ptr)
+    {
         destroy(ptr);
         node_alloc::deallocate(ptr);
     }
@@ -138,8 +144,9 @@ public:
     //迭代器
     iterator begin() { return iterator(_entry->_next); }
     iterator end() { return iterator(_entry); }
-    const_iterator begin() const { return const_iterator(_entry->_next); }
-    const_iterator end() const { return const_iterator(_entry); }
+    //暂时未实现只读(const)迭代器
+    iterator begin() const { return iterator(_entry->_next); }
+    iterator end() const { return iterator(_entry); }
 
     //容量
     bool empty() { return _size == 0; }
@@ -155,7 +162,11 @@ public:
     iterator erase(iterator begin, iterator end);
 
     void push_back(const_reference value) { insert(end(), value); }
-    void pop_back() { iterator tmp = end(); erase(--tmp); }
+    void pop_back()
+    {
+        iterator tmp = end();
+        erase(--tmp);
+    }
     void push_front(const_reference value) { insert(begin(), value); }
     void pop_front() { erase(begin()); }
 
@@ -190,7 +201,6 @@ template <typename T>
 template <class Iter>
 typename list<T>::iterator list<T>::insert(iterator pos, Iter start, Iter finish)
 {
-    _size += (finish - start);
     node_pointer newnode = pos._node->_prev;
     while (start != finish)
     {
@@ -198,6 +208,7 @@ typename list<T>::iterator list<T>::insert(iterator pos, Iter start, Iter finish
         newnode->_next->_prev = newnode;
         newnode = newnode->_next;
         ++start;
+        ++_size;
     }
     newnode->_next = pos._node;
     pos._node->_prev = newnode;
@@ -234,7 +245,8 @@ inline typename list<T>::iterator list<T>::erase(iterator pos)
 template <typename T>
 inline typename list<T>::iterator list<T>::erase(iterator start, iterator finish)
 {
-    iterator begin1 = start; --begin1;
+    iterator begin1 = start;
+    --begin1;
     begin1._node->_next = finish._node;
     finish._node->_prev = begin1._node;
     while (start != finish)

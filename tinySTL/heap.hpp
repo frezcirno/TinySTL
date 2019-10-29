@@ -1,5 +1,4 @@
 #pragma once
-
 #include "functor.hpp"
 #include "type_traits.hpp"
 namespace tinySTL
@@ -57,13 +56,12 @@ void make_heap(Iter start, Iter end)
     while (tofix > 0)
     {
         //调整 tofix 节点
-        value_type value = *(start + tofix);
         _sink_fix(start, len, tofix, *(start + tofix), less<value_type>());
         --tofix;
     }
 }
 template <class Iter, class Compare>
-void make_heap(Iter start, Iter end, Compare &comp)
+void make_heap(Iter start, Iter end, Compare comp)
 {
     typedef typename iterator_traits<Iter>::value_type value_type;
     if (end - start < 2)
@@ -99,7 +97,7 @@ void _sift_fix(Iterator first, int top, int hole, const T &value, Compare &comp)
  * 功能：向下调整hole的位置, 找到合适的位置将value存入
  * **/
 template <class Iterator, typename T, class Compare>
-void _sink_fix(Iterator first, int len, int hole, const T &value, Compare &comp)
+void _sink_fix(Iterator first, int len, int hole, const T &value, Compare comp)
 {
     /* 1.将hole下移到叶子处 */
     int bigChild = 2 * hole + 2; //从右孩子开始考虑

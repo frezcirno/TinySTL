@@ -1,17 +1,18 @@
 #pragma once
-// #include "allocator.hpp"
+#include "allocator.hpp"
+#include "construct.hpp"
 #include "uninitialized.hpp"
 #include "algorithm.hpp"
 #include "iterator.hpp"
 namespace tinySTL
 {
 
-template <typename T>//T 不能是const, volatile类型
+template <typename T> //T 不能是const, volatile类型
 class vector
 {
 public:
     typedef allocator<T> Alloc;
-    
+
     typedef size_t size_type;
     typedef ptrdiff_t diff_type;
     typedef T value_type;
@@ -24,7 +25,6 @@ public:
     // typedef pointer_iterator<const_pointer> const_iterator; //只读迭代器,而非迭代器不可变
     typedef pointer iterator;
     typedef const_pointer const_iterator; //只读迭代器,而非迭代器不可变
-
 
 private:
     pointer _element;
@@ -188,14 +188,14 @@ void vector<T>::insert(iterator pos, diff_type count, const_reference value)
             //构造在vector末尾新增的count个元素(以原来的结尾为蓝本)
             _finish = uninitialized_copy(old_end - count, old_end, old_end);
             //拷贝[pos+count,end-count)的元素
-            copy_backward(pos/*.base()*/, old_end - count, old_end);
+            copy_backward(pos /*.base()*/, old_end - count, old_end);
             fill_n(pos, count, value);
         }
         else /*新插入元素个数较多, count > num_elem_after */
         {
             uninitialized_fill_n(old_end, count - num_elem_after, value);
-            _finish = uninitialized_copy(pos/*.base()*/, old_end, pos/*.base()*/ + count);
-            fill(pos/*.base()*/, old_end, value);
+            _finish = uninitialized_copy(pos /*.base()*/, old_end, pos /*.base()*/ + count);
+            fill(pos /*.base()*/, old_end, value);
         }
     }
     else /*空间不足*/
@@ -203,9 +203,9 @@ void vector<T>::insert(iterator pos, diff_type count, const_reference value)
         diff_type newCapacity = (_finish - _element) + count;
         pointer newSpace = Alloc::allocate(newCapacity);
         pointer finish;
-        finish = uninitialized_copy(_element, pos/*.base()*/, newSpace);
+        finish = uninitialized_copy(_element, pos /*.base()*/, newSpace);
         finish = uninitialized_fill_n(finish, count, value); //构造count个value
-        finish = uninitialized_copy(pos/*.base()*/, _finish, finish);
+        finish = uninitialized_copy(pos /*.base()*/, _finish, finish);
         destroy(_element, _finish);
         Alloc::deallocate(_element);
         _element = newSpace;

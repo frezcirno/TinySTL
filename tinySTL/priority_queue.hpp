@@ -1,12 +1,9 @@
+#pragma once
 #include "heap.hpp"
 #include "functor.hpp"
 #include "vector.hpp"
 namespace tinySTL
 {
-/*
- * 
- * 
-*/
 template <typename T, class Sequence = vector<T>, class Compare = less<T>>
 class priority_queue
 {
@@ -16,7 +13,7 @@ public:
     typedef typename Sequence::const_reference const_reference;
 
 public:
-// private:
+    // private:
     Sequence _container;
     Compare _comparer;
 

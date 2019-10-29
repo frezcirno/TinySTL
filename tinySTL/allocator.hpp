@@ -31,14 +31,14 @@ public:
 
 //阻止类型
 template <typename T>
-class allocator<const T>
+class allocator<const T>//类型不能为const
 {
 public:
     typedef T value_type;
 };
 
 template <typename T>
-class allocator<volatile T>
+class allocator<volatile T>//类型不能为volatile
 {
 public:
     typedef T value_type;

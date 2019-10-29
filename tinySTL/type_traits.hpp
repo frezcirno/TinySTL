@@ -3,7 +3,20 @@
 namespace tinySTL
 {
 
-//iterator_traits
+template <typename T>
+struct no_const
+{
+    typedef T type;
+};
+template <typename T>
+struct no_const<const T>
+{
+    typedef T type;
+};
+
+
+
+//iterator_traits, 供算法使用获取迭代器属性
 template <class iterator>
 struct iterator_traits
 {
@@ -31,7 +44,7 @@ struct iterator_traits<const T *>
     typedef ptrdiff_t diff_type;
 };
 
-//type_traits
+//type_traits, 判别POD类型使用
 #define EMPTY_STRUCT {}
 struct __true EMPTY_STRUCT;
 struct __false EMPTY_STRUCT;

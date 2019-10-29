@@ -13,6 +13,7 @@ Iter2 copy(Iter start, Iter end, Iter2 dst)
     return dst;
 }
 
+//  [start, end) -> [ret, dst_end)
 template <class Iter, class Iter2>
 Iter2 copy_backward(Iter start, Iter end, Iter2 dst_end)
 {

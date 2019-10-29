@@ -1,21 +1,28 @@
 #pragma once
 #include <cstring>
 #include "allocator.hpp"
+#include "construct.hpp"
+#include "algorithm.hpp"
 namespace tinySTL
 {
 
 /**用来计算deque中每个buffer内部的元素个数 */
-inline unsigned int _buffer_size(unsigned int buf_siz, unsigned int elem_siz)
+inline size_t _buffer_size(size_t buf_siz, size_t elem_siz) noexcept
 {
     return (buf_siz != 0) ? (buf_siz)
                           : ((elem_siz < 512) ? (512 / elem_siz) : 1);
 }
 
-template <typename T, unsigned int buf_siz>
+template <typename T, size_t buf_siz>
 class _DequeIterator
 {
 public:
     typedef T value_type;
+    typedef T *pointer;
+    typedef T &reference;
+    typedef size_t size_type;
+    typedef int diff_type;
+
     typedef _DequeIterator<T, buf_siz> self;
 
 public:
@@ -25,7 +32,7 @@ public:
     T **map_node; //指向中控器的元素
 
 private:
-    static unsigned int buffer_size()
+    static size_type buffer_size() noexcept
     {
         static int _buf_siz = _buffer_size(buf_siz, sizeof(T));
         return _buf_siz;
@@ -43,7 +50,7 @@ public:
     T &operator*() const { return *cur; }
     T *operator->() const { return &(operator*()); }
 
-    unsigned int operator-(const self &x) const
+    size_type operator-(const self &x) const
     {
         return buffer_size() * (map_node - x.map_node - 1) + (cur - _start) +
                (x._finish - x.cur);
@@ -114,7 +121,7 @@ public:
         return tmp += -n;
     }
 
-    T &operator[](unsigned int n) { return *(*this + n); }
+    T &operator[](size_type n) { return *(*this + n); }
     bool operator==(const self &x) const { return cur == x.cur; }
     bool operator!=(const self &x) const { return cur != x.cur; }
     bool operator<(const self &x) const
@@ -129,54 +136,70 @@ public:
     }
 };
 
-template <typename T, unsigned int buf_siz = 0>
+template <typename T, size_t buf_siz = 0>
 class deque
 {
 public:
+    typedef T value_type;
+    typedef T *pointer;
+    typedef T &reference;
+    typedef const T *const_pointer;
+    typedef const T &const_reference;
+    typedef size_t size_type;
+    typedef int diff_type;
+
     typedef _DequeIterator<T, buf_siz> iterator;
+
     typedef allocator<T> Alloc;
 
-    deque(unsigned int n = 0);
-    deque(unsigned int n, const T &value);
+public:
+    deque(size_type n = 0);
+    deque(size_type n, const_reference value);
+    template <class Iter>
+    deque(Iter start, Iter finish) : deque() { assign(start, finish); }
+    deque(const self &rhs) : deque() { assign(rhs.begin(), rhs.end()); }
     ~deque();
 
-    iterator begin() { return _start; }
-    iterator end() { return _finish; }
-    T &front() { return *_start; }
-    T &back() { return *(_finish - 1); }
+    template <class Iter>
+    void assign(Iter start, Iter finish);
+
+    iterator begin() noexcept { return _start; }
+    iterator end() noexcept { return _finish; }
+    T &front() noexcept { return *_start; }
+    T &back() noexcept { return *(_finish - 1); }
 
     void clear();
-    void push_back(const T &value);
-    void push_front(const T &value);
+    void push_back(const_reference value);
+    void push_front(const_reference value);
     void pop_back();
     void pop_front();
-    iterator insert(const iterator &pos, const T &value);
-    iterator erase(const iterator &pos);
+    iterator insert(iterator pos, const_reference value);
+    iterator erase(iterator pos);
 
-    unsigned int size() const { return _finish - _start; }
-    bool empty() const { return _finish == _start; }
+    size_type size() const noexcept { return _finish - _start; }
+    bool empty() const noexcept { return _finish == _start; }
 
 private:
     T **_map; //中控器
     iterator _start;
     iterator _finish;
-    unsigned int _capacity; //buffer的数量
+    size_type _capacity; //buffer的数量
 
 private:
-    static unsigned int buffer_size()
+    static size_type buffer_size()
     {
         static int _buf_siz = _buffer_size(buf_siz, sizeof(T));
         return _buf_siz;
     }
-    void expand_map(unsigned int num_new_buf = 1,
+    void expand_map(size_type num_new_buf = 1,
                     bool at_front = false); //空间扩充算法
 };
 
-template <typename T, unsigned int buf_siz>
-deque<T, buf_siz>::deque(unsigned int n)
+template <typename T, size_t buf_siz>
+deque<T, buf_siz>::deque(size_type n)
     : _start(), _finish(), _map(0), _capacity(0)
 {
-    unsigned int num_buf = n / buffer_size() + 1;
+    size_type num_buf = n / buffer_size() + 1;
     // map创建
     _capacity = num_buf + 2; //前后各留一个buffer的余量
     if (_capacity < 8)
@@ -194,8 +217,8 @@ deque<T, buf_siz>::deque(unsigned int n)
     _finish.cur = _finish._start + n % buffer_size();
 }
 
-template <typename T, unsigned int buf_siz>
-deque<T, buf_siz>::deque(unsigned int n, const T &value) : deque(n)
+template <typename T, size_t buf_siz>
+deque<T, buf_siz>::deque(size_type n, const_reference value) : deque(n)
 {
     //元素构造
     for (T **cur_buf = _start.map_node; cur_buf < _finish.map_node; ++cur_buf)
@@ -203,20 +226,20 @@ deque<T, buf_siz>::deque(unsigned int n, const T &value) : deque(n)
     uninitialized_fill(_finish._start, _finish.cur, value);
 }
 
-template <typename T, unsigned int buf_siz>
+template <typename T, size_t buf_siz>
 deque<T, buf_siz>::~deque()
 {
     clear();
-    delete[] _start._start;
+    Alloc::deallocate(_start._start);
     delete[] _map;
 }
 
-template <typename T, unsigned int buf_siz>
-void deque<T, buf_siz>::expand_map(unsigned int num_new_buf, bool at_front)
+template <typename T, size_t buf_siz>
+void deque<T, buf_siz>::expand_map(size_type num_new_buf, bool at_front)
 {
-    unsigned int old_size = _finish.map_node - _start.map_node + 1;
+    size_type old_size = _finish.map_node - _start.map_node + 1;
     //已使用的buffer个数
-    unsigned int new_size = old_size + num_new_buf;
+    size_type new_size = old_size + num_new_buf;
     //一共需要的buffer个数
     T **new_nstart;
     if (_capacity > 2 * new_size)
@@ -232,7 +255,7 @@ void deque<T, buf_siz>::expand_map(unsigned int num_new_buf, bool at_front)
     {
         /*剩余空间不足*/
         // 申请-
-        unsigned int new_capacity = _capacity + num_new_buf + 2;
+        size_type new_capacity = _capacity + num_new_buf + 2;
         T **new_map = new T *[new_capacity];
 
         new_nstart = new_map + (new_capacity - num_new_buf) / 2;
@@ -249,8 +272,8 @@ void deque<T, buf_siz>::expand_map(unsigned int num_new_buf, bool at_front)
     _finish.jump(new_nstart + old_size - 1);
 }
 
-template <typename T, unsigned int buf_siz>
-void deque<T, buf_siz>::push_back(const T &value)
+template <typename T, size_t buf_siz>
+void deque<T, buf_siz>::push_back(const_reference value)
 {
     if (_finish.cur != _finish._finish)
     {
@@ -267,8 +290,8 @@ void deque<T, buf_siz>::push_back(const T &value)
     }
 }
 
-template <typename T, unsigned int buf_siz>
-void deque<T, buf_siz>::push_front(const T &value)
+template <typename T, size_t buf_siz>
+void deque<T, buf_siz>::push_front(const_reference value)
 {
     if (_start.cur != _start._start)
     {
@@ -285,7 +308,7 @@ void deque<T, buf_siz>::push_front(const T &value)
     }
 }
 
-template <typename T, unsigned int buf_siz>
+template <typename T, size_t buf_siz>
 void deque<T, buf_siz>::pop_back()
 {
     if (_finish.cur != _finish._start)
@@ -296,13 +319,13 @@ void deque<T, buf_siz>::pop_back()
     else
     {
         destroy(_finish.cur);
-        delete[] _finish._start;
+        Alloc::deallocate(_finish._start);
         _finish.jump(_finish.map_node - 1);
         _finish.cur = _finish._finish - 1;
     }
 }
 
-template <typename T, unsigned int buf_siz>
+template <typename T, size_t buf_siz>
 void deque<T, buf_siz>::pop_front()
 {
     if (_start.cur != _start._finish)
@@ -313,102 +336,91 @@ void deque<T, buf_siz>::pop_front()
     else
     {
         destroy(_start.cur);
-        delete[] _start._start;
+        Alloc::deallocate(_start._start);
         _start.jump(_start.map_node + 1);
         _start.cur = _start._start;
     }
 }
 
-template <typename T, unsigned int buf_siz>
+template <typename T, size_t buf_siz>
 void deque<T, buf_siz>::clear()
 {
     for (T **cur_buf = _start.map_node + 1; cur_buf < _finish.map_node;
          ++cur_buf)
     {
-        for (T *cur = *cur_buf; cur < *cur_buf + buffer_size(); ++cur)
-            destroy(cur);
-        delete[](*cur_buf);
+        destroy(cur_buf, cur_buf + buffer_size());
+        Alloc::deallocate(*cur_buf);
     }
     //处理首尾两个buffer
     if (_start.map_node != _finish.map_node)
     {
         /*首尾buffer不重叠*/
-        for (T *cur = _start._start; cur < _start._finish; ++cur)
-            destroy(cur);
-        for (T *cur = _finish._start; cur < _finish._finish; ++cur)
-            destroy(cur);
-        delete[] _finish.map_node;
+        destroy(_start._start, _start._finish);
+        destroy(_finish._start, _finish._finish);
+        Alloc::deallocate(_finish._start);
     }
     else
     {
         /*首尾buffer重叠*/
-        for (T *cur = _start.cur; cur < _finish.cur; ++cur)
-            destroy(cur);
+        destroy(_start.cur, _finish.cur);
     }
 
     _finish = _start; //保留一个空buffer
 }
 
-template <typename T, unsigned int buf_siz>
+template <typename T, size_t buf_siz>
 typename deque<T, buf_siz>::iterator deque<T, buf_siz>::insert(
-    const iterator &pos, const T &value)
+    iterator pos, const_reference value)
 {
-    unsigned int num_before = pos - _start;
+    size_type num_before = pos - _start;
     if (num_before < size() / 2)
     {
         /*前面元素少,向前移动*/
         push_front(front()); //保证前面有空间
-        iterator stop = pos;
-        ++stop;
-        // move
-        for (iterator src = _start + 1, dst = _start; src != stop; ++pos, ++dst)
-            *dst = *src;
+        copy(_start + 1, pos + 1, _start);
+        --pos;
     }
     else
     {
         /*后面元素少,向后移动*/
-        push_back(back()); //保证前面有空间
-        iterator stop = pos;
-        --stop;
-        // move
-        for (iterator src = _finish - 1, dst = _finish; src != stop; --pos, --dst)
-            *dst = *src;
+        push_back(back()); //保证后面有空间
+        copy_backward(pos, _finish, _finish + 1);
     }
     *pos = value;
     return pos;
 }
 
-template <typename T, unsigned int buf_siz>
-typename deque<T, buf_siz>::iterator deque<T, buf_siz>::erase(
-    const iterator &pos)
+template <typename T, size_t buf_siz>
+typename deque<T, buf_siz>::iterator deque<T, buf_siz>::erase(iterator pos)
 {
-    unsigned int num_before = pos - _start;
+    size_type num_before = pos - _start;
     if (num_before < size() / 2)
     {
         /*前面元素少,前面向后补齐*/
-        // move_backward
-        for (iterator src = pos - 1, dst = pos; dst != _start; ++pos, ++dst)
-            *dst = *src;
+        copy_backward(_start, pos, pos + 1);
         iterator new_start = _start + 1;
         destroy(_start.cur);
         if (_start.map_node != new_start.map_node)
-            delete[] * _start.map_node;
+            Alloc::deallocate(_start.map_node);
         _start = new_start;
         return pos + 1;
     }
     else
     {
         /*后面元素少,后面向前补齐*/
-        // move
-        for (iterator src = pos + 1, dst = pos; src != _finish; ++pos, ++dst)
-            *dst = *src;
+        copy(pos + 1, _finish, pos);
         iterator new_finish = _finish - 1;
         destroy(_finish.cur);
         if (_finish.map_node != new_finish.map_node)
-            delete[] * _finish.map_node;
+            Alloc::deallocate(_finish.map_node);
         _finish = new_finish;
         return pos;
     }
 }
-
+template <typename T, size_t buf_siz>
+template <class Iter>
+void deque<T, buf_siz>::assign(Iter start, Iter finish)
+{
+    //TODO
+}
 } // namespace tinySTL
