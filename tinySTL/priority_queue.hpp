@@ -12,8 +12,8 @@ public:
     typedef typename Sequence::reference reference;
     typedef typename Sequence::const_reference const_reference;
 
-public:
-    // private:
+    // public:
+private:
     Sequence _container;
     Compare _comparer;
 

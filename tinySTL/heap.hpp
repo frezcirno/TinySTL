@@ -12,12 +12,15 @@ template <class Iter>
 void push_heap(Iter start, Iter end)
 {
     typedef typename iterator_traits<Iter>::value_type value_type;
-    _sift_fix(start, end - start - 1, 0, *(end - 1), less<value_type>());
+    value_type value = *(end - 1);
+    _sift_fix(start, 0, end - start - 1, value, less<value_type>());
 }
 template <class Iter, class Compare>
 void push_heap(Iter start, Iter end, Compare &comp)
 {
-    _sift_fix(start, end - start - 1, 0, *(end - 1), comp);
+    typedef typename iterator_traits<Iter>::value_type value_type;
+    value_type value = *(end - 1);
+    _sift_fix(start, 0, end - start - 1, value, comp);
 }
 
 /**
@@ -30,7 +33,7 @@ void pop_heap(Iter start, Iter end)
     typedef typename iterator_traits<Iter>::value_type value_type;
     value_type value = *(end - 1); //将原来的末尾值保存起来
     *(end - 1) = *(start);         //将*(start)移动到*(end-1),*(start)处出现hole
-    _sink_fix(start, end - start, 0, value, less<value_type>());
+    _sink_fix(start, end - start - 1, 0, value, less<value_type>());
 }
 template <class Iter, class Compare>
 void pop_heap(Iter start, Iter end, Compare &comp)
@@ -38,7 +41,7 @@ void pop_heap(Iter start, Iter end, Compare &comp)
     typedef typename iterator_traits<Iter>::value_type value_type;
     value_type value = *(end - 1); //将原来的末尾值保存起来
     *(end - 1) = *(start);         //将*(start)移动到*(end-1),*(start)处出现hole
-    _sink_fix(start, end - start, 0, value, comp);
+    _sink_fix(start, end - start - 1, 0, value, comp);
 }
 
 /**
@@ -53,17 +56,17 @@ void make_heap(Iter start, Iter end)
         return;
     int len = end - start;
     int tofix = (len - 2) / 2;
-    while (tofix > 0)
+    while (tofix >= 0)
     {
         //调整 tofix 节点
-        _sink_fix(start, len, tofix, *(start + tofix), less<value_type>());
+        value_type value = *(start + tofix);
+        _sink_fix(start, len, tofix, value, less<value_type>());
         --tofix;
     }
 }
 template <class Iter, class Compare>
 void make_heap(Iter start, Iter end, Compare comp)
 {
-    typedef typename iterator_traits<Iter>::value_type value_type;
     if (end - start < 2)
         return;
     int len = end - start;
@@ -71,7 +74,6 @@ void make_heap(Iter start, Iter end, Compare comp)
     while (tofix > 0)
     {
         //调整 tofix 节点
-        value_type value = *(start + tofix);
         _sink_fix(start, len, tofix, *(start + tofix), comp);
         --tofix;
     }
@@ -81,14 +83,14 @@ void make_heap(Iter start, Iter end, Compare comp)
  * 功能：向上调整hole的位置, 找到合适的位置将value存入
  * **/
 template <class Iterator, typename T, class Compare>
-void _sift_fix(Iterator first, int top, int hole, const T &value, Compare &comp)
+void _sift_fix(Iterator first, int top, int hole, const T &value, Compare comp)
 {
     int parent = (hole - 1) / 2;
-    while (parent > top && comp(*(first + hole), value))
+    while (parent >= top && comp(*(first + parent), value))
     {
         *(first + hole) = *(first + parent);
         hole = parent;
-        parent = (hole - 1) / 2;
+        parent = (hole + 1) / 2 - 1;
     }
     *(first + hole) = value;
 }
@@ -107,11 +109,10 @@ void _sink_fix(Iterator first, int len, int hole, const T &value, Compare comp)
             bigChild--; //左孩子大于右孩子
         *(first + hole) = *(first + bigChild);
         hole = bigChild;
-        bigChild = 2 * hole + 1;
+        bigChild = 2 * hole + 2;
     }
-    if (len % 2 == 0 && bigChild == (len - 2) / 2)
+    if (len % 2 == 0 && bigChild == len)
     { //特殊情况：最后一个节点为左节点, 没有兄弟节点
-        bigChild = 2 * (bigChild + 1);
         *(first + hole) = *(first + bigChild - 1);
         hole = bigChild - 1;
     }

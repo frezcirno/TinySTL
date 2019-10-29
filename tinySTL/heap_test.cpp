@@ -17,13 +17,27 @@ void print(T &vec)
 
 int main(int argc, char const *argv[])
 {
-    int a[] = {10, 9, 8, 7, 6, 5, 4, 3, 2, 1};
+    int a[] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
 
-    tinySTL::vector<int> ivec(a, a + 10);
+    tinySTL::vector<int> ivec(a, a + 9);
     print(ivec);
 
     tinySTL::make_heap(ivec.begin(), ivec.end());
     print(ivec);
+
+    ivec.push_back(999);
+    print(ivec);
+
+    tinySTL::push_heap(ivec.begin(), ivec.end());
+    print(ivec);
+
+    tinySTL::pop_heap(ivec.begin(), ivec.end());
+    print(ivec);
+
+    ivec.pop_back();
+    print(ivec);
+    
+
 
     return 0;
 }
