@@ -1,31 +1,28 @@
-#pragma once
+﻿#pragma once
 #include "tree.hpp"
 #include "pair.hpp"
 namespace tinySTL
 {
-template <typename T>
-class identity
-{
-public:
-    T &operator()(const T &x) { return x; }
-};
 
-template <typename Key, class Compare>
+template <typename T, class Compare = less<int>>
 class set
 {
 public:
-    typedef Key key_type;
-    typedef Key value_type;
-
-    typedef rb_tree<value_type, key_type, identity<value_type>, Compare> c_type;
-    typedef c_type::pointer pointer;
-    typedef c_type::const_pointer const_pointer;
-    typedef c_type::reference reference;
-    typedef c_type::const_reference const_reference;
-    typedef c_type::const_iterator const_iterator;
+    typedef T value_type;
 
 private:
+    typedef rb_tree<T, T, identity<T>, Compare> c_type;
     c_type c;
+
+public:
+    typedef typename c_type::pointer pointer;
+    typedef typename c_type::const_pointer const_pointer;
+    typedef typename c_type::reference reference;
+    typedef typename c_type::const_reference const_reference;
+
+    typedef typename c_type::const_iterator const_iterator; //set只有只读迭代器
+    typedef typename c_type::size_type size_type;
+    typedef typename c_type::diff_type diff_type;
 
 public:
     set() : c() {}
@@ -40,39 +37,22 @@ public:
     ~set() {}
 
     void clear() noexcept { return c.clear(); }
-
-    size_t size() const { return c.size(); }
-    bool empty() const { return c.empty(); }
-
+    size_t size() const noexcept { return c.size(); }
+    bool empty() const noexcept { return c.empty(); }
     const_iterator begin() const { return c.begin(); }
     const_iterator end() const { return c.end(); }
 
-    const_iterator insert(const_iterator pos, const value_type &value)
-    {
-        return c.insert_unique(pos, value);
-    }
-    template <class Iter>
-    void insert(Iter start, Iter finish) /*范围插入*/
-    {
-        return c.insert_unique(start, finish);
-    }
+    void insert(const T &x) { c.insert_unique(x); }
 
-    const_iterator erase(const_iterator pos)
-    {
-        return c.erase(pos);
-    }
-    size_t erase(const key_type &x)
-    {
-        return c.erase(x);
-    }
-    const_iterator find(const key_type &x) const
-    {
-        return c.find(x);
-    }
-    bool contains(const value_type &x) const
-    {
-        return c.find(x) != c.end();
-    }
+    template <class Iter>
+    void insert(Iter start, Iter finish) { c.insert_unique(start, finish); }
+
+    void erase(const_iterator pos) { c.erase(pos); }
+    size_t erase(const_reference x) { return c.erase(x); }
+
+    const_iterator find(const_reference x) const { return c.find(x); }
+
+    bool contains(const_reference x) const { return c.find(x) != c.end(); }
 };
 
 } // namespace tinySTL
