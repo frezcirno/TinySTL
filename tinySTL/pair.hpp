@@ -1,4 +1,5 @@
 #pragma once
+#include <ostream>
 namespace tinySTL
 {
 
@@ -58,6 +59,13 @@ template <typename T1, typename T2>
 inline bool operator>=(const pair<T1, T2> &lhs, const pair<T1, T2> &rhs)
 {
     return !(lhs < rhs);
+}
+
+template <typename T1, typename T2>
+std::ostream &operator<<(std::ostream &os, const pair<T1, T2> &p)
+{
+    os << "(" << p.first << ", " << p.second << ")";
+    return os;
 }
 
 template <class Pair>

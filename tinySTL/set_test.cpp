@@ -6,15 +6,6 @@ using namespace std;
 
 #include "mem_test.h"
 
-template <typename Tree>
-void print(const Tree &tree)
-{
-    for (auto it = tree.begin(); it != tree.end(); ++it)
-    {
-        cout << *it << " ";
-    }
-    cout << endl;
-}
 
 int main(int argc, char const *argv[])
 {

@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "allocator.hpp"
 #include "pair.hpp"
 #include "construct.hpp"
@@ -162,8 +162,8 @@ public:
     }
 
 private:
-    static value_type &_value(base_ptr x) { return static_cast<link_type>(x)->value; }
-    static Key &_key(base_ptr x) { return ValtoKey()(_value(x)); }
+    static value_type& _value(base_ptr x) { return static_cast<link_type>(x)->value; }
+    static Key _key(base_ptr x) { return ValtoKey()(_value(x)); }
 
     void _reset()
     {
