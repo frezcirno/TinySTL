@@ -3,17 +3,17 @@
 using namespace std;
 
 template <typename T>
-void intersect(const tinySTL::list<T> &l1, const tinySTL::list<T> &l2, tinySTL::list<T> &l3)
+void intersect(const tinySTL::list<T> &l1,
+			   const tinySTL::list<T> &l2,
+               tinySTL::list<T> &l3)
 {
     auto it1 = l1.begin(), it2 = l2.begin();
-    while (it1 != l1.end() && it2 != l2.end())
-    {
-        if (*it1 < *it2)
+    while (it1 != l1.end() && it2 != l2.end()) {
+        if (*it1 < *it2)  //如果l1当前元素小于l2
             ++it1;
         else if (*it2 < *it1)
             ++it2;
-        else
-        {
+        else {
             l3.push_back(*it1);
             ++it1;
             ++it2;
@@ -24,16 +24,14 @@ void intersect(const tinySTL::list<T> &l1, const tinySTL::list<T> &l2, tinySTL::
 int main()
 {
     tinySTL::list<int> l1, l2, l3;
+
     int i;
-    while (cin >> i && i != -1)
-        l1.push_back(i);
-    while (cin >> i && i != -1)
-        l2.push_back(i);
+    while (cin >> i && i != -1) l1.push_back(i);
+    while (cin >> i && i != -1) l2.push_back(i);
     intersect(l1, l2, l3);
-    if (l3.size() == 0)
-        cout << "NULL";
+    if (!l3.empty())
+        for (auto it = l3.begin(); it != l3.end(); it++) cout << *it << " ";
     else
-        for (auto it = l3.begin(); it != l3.end(); it++)
-            cout << *it << " ";
+        cout << "NULL";
     return 0;
 }

@@ -4,12 +4,12 @@ namespace tinySTL
 {
 
 template <typename T>
-struct no_const
+struct remove_const
 {
     typedef T type;
 };
 template <typename T>
-struct no_const<const T>
+struct remove_const<const T>
 {
     typedef T type;
 };
@@ -49,21 +49,22 @@ struct iterator_traits<const T *>
 struct __true EMPTY_STRUCT;
 struct __false EMPTY_STRUCT;
 
-template <typename T> struct type_traits{    typedef __false is_POD;  };
+template <typename T> struct is_pod  {    typedef __false type;  };
 
-template <> struct type_traits<char>{           typedef __true is_POD;  };
-template <> struct type_traits<signed char>{    typedef __true is_POD;};
-template <> struct type_traits<unsigned char>{  typedef __true is_POD;};
-template <> struct type_traits<short>{          typedef __true is_POD;};
-template <> struct type_traits<unsigned short>{ typedef __true is_POD;};
-template <> struct type_traits<int>{            typedef __true is_POD;};
-template <> struct type_traits<unsigned int>{   typedef __true is_POD;};
-template <> struct type_traits<long>{           typedef __true is_POD;};
-template <> struct type_traits<unsigned long>{  typedef __true is_POD;};
-template <> struct type_traits<float>{          typedef __true is_POD;};
-template <> struct type_traits<double>{         typedef __true is_POD;};
-template <> struct type_traits<long double>{    typedef __true is_POD;};
-template <typename T> struct type_traits<T *>{  typedef __true is_POD;};
+template <> struct is_pod<char>  {           typedef __true type;  };
+template <> struct is_pod<signed char>  {    typedef __true type;  };
+template <> struct is_pod<unsigned char>  {  typedef __true type;  };
+template <> struct is_pod<short>  {          typedef __true type;  };
+template <> struct is_pod<unsigned short>  { typedef __true type;  };
+template <> struct is_pod<int>  {            typedef __true type;  };
+template <> struct is_pod<unsigned int>  {   typedef __true type;  };
+template <> struct is_pod<long>  {           typedef __true type;  };
+template <> struct is_pod<unsigned long>  {  typedef __true type;  };
+template <> struct is_pod<float>  {          typedef __true type;  };
+template <> struct is_pod<double>  {         typedef __true type;  };
+template <> struct is_pod<long double>  {    typedef __true type;  };
+template <class T> struct is_pod<T *>  {  typedef __true type;  };
+
 
 
 } // namespace tinySTL

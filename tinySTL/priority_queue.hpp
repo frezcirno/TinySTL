@@ -1,27 +1,27 @@
-#pragma once
-#include "heap.hpp"
+﻿#pragma once
 #include "functor.hpp"
+#include "heap.hpp"
 #include "vector.hpp"
 namespace tinySTL
 {
-template <typename T, class Sequence = vector<T>, class Compare = less<T>>
+template <typename T, class Compare = less<T>, class Sequence = vector<T>>
 class priority_queue
 {
-public:
+  public:
     typedef typename Sequence::value_type value_type;
     typedef typename Sequence::reference reference;
     typedef typename Sequence::const_reference const_reference;
 
-    // public:
-private:
+    // private:
+  public:
     Sequence _container;
     Compare _comparer;
 
-public:
+  public:
     priority_queue() : _container() {}
+    priority_queue(const Compare &comp) : _container(), _comparer(comp) {}
     template <class iterator>
-    priority_queue(iterator first, iterator last) //默认comparer采用less
-        : _container(first, last)
+    priority_queue(iterator first, iterator last) : _container(first, last)
     {
         make_heap(first, last, _comparer);
     }
@@ -50,4 +50,4 @@ public:
     }
 };
 
-} // namespace tinySTL
+}  // namespace tinySTL

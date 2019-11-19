@@ -1,35 +1,12 @@
-#pragma once
+﻿#pragma once
 #include "deque.hpp"
-
 namespace tinySTL
 {
-
-/* Forward Declaraion */
 template <typename T, class Sequence = deque<T>>
-class queue;
-
-template <typename T, class Sequence>
-inline bool operator==(const queue<T, Sequence> &x,
-                       const queue<T, Sequence> &y)
-{
-    return x.c == y.c;
-}
-
-template <typename T, class Sequence>
-inline bool operator<(const queue<T, Sequence> &x,
-                      const queue<T, Sequence> &y)
-{
-    return x.c < y.c;
-}
-
-template <typename T, class Sequence>
 class queue
 {
-    friend bool operator==<>(const queue &, const queue &);
-    friend bool operator</**/<>(const queue &, const queue &);
-
-public:
-    queue() {}
+  public:
+    queue() : c() {}
     queue(unsigned int n, const T &value) : c(n, value) {}
     ~queue() {}
 
@@ -44,8 +21,25 @@ public:
     T &back() { return c.back(); }
     const T &back() const { return c.back(); }
 
-private:
+  public:
+    // private:
     Sequence c;
+
+  private:
+    friend bool operator==(const queue &, const queue &);
+    friend bool operator<(const queue &, const queue &);
 };
 
-} // namespace tinySTL
+template <typename T, class Sequence>
+inline bool operator==(const queue<T, Sequence> &x, const queue<T, Sequence> &y)
+{
+    return x.c == y.c;
+}
+
+template <typename T, class Sequence>
+inline bool operator<(const queue<T, Sequence> &x, const queue<T, Sequence> &y)
+{
+    return x.c < y.c;
+}
+
+}  // namespace tinySTL

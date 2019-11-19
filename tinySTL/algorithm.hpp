@@ -1,4 +1,5 @@
-#pragma once
+﻿#pragma once
+#define _CRT_SECURE_NO_WARNINGS
 namespace tinySTL
 {
 template <class Iter, class Iter2>
@@ -17,12 +18,11 @@ Iter2 copy(Iter start, Iter end, Iter2 dst)
 template <class Iter, class Iter2>
 Iter2 copy_backward(Iter start, Iter end, Iter2 dst_end)
 {
-    do
-    {
+    while (end != start) {
         --dst_end;
         --end;
         *dst_end = *end;
-    } while (end != start);
+    }
     return dst_end;
 }
 
@@ -54,6 +54,16 @@ void swap(T& t1, T& t2) {
 	T tmp = t1;
 	t1 = t2;
 	t2 = tmp;
+}
+
+template <class Iter, typename T>
+Iter find(Iter begin, Iter end, const T &value)
+{
+    while (begin != end) {
+        if (*begin == value) return begin;
+        ++begin;
+    }
+    return end;
 }
 
 } // namespace tinySTL

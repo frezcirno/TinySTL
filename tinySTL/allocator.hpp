@@ -1,5 +1,7 @@
 ﻿#pragma once
+#define _CRT_SECURE_NO_WARNINGS
 #include <new>
+#include <cstddef>
 namespace tinySTL
 {
 //分配器
@@ -22,8 +24,8 @@ public:
         if (!space)
             throw "::operator new error!";
         return space;
-    };
-    static void deallocate(pointer p) { ::operator delete(p); };
+    }
+    static void deallocate(pointer p) { ::operator delete(p); }
 
     //取地址
     static pointer address(reference x) { return (pointer)&x; }

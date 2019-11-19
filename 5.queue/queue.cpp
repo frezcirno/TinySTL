@@ -1,24 +1,24 @@
 #include <iostream>
 #include "../tinySTL/queue.hpp"
-using namespace std;
 
-void print(int x)
+inline void print(int x)
 {
     static bool first = true;
-    if (!first) cout << " ";
+    if (!first) std::cout << " ";
     first = false;
-    cout << x;
+    std::cout << x;
 }
 
 int main()
 {
     tinySTL::queue<int> qa, qb;
-    int n, x;
+    int n;
 
-    cin >> n;
+    std::cin >> n;
     for (int i = 0; i < n; i++)
     {
-        cin >> x;
+        int x;
+        std::cin >> x;
         if (x % 2 != 0) qa.push(x);
         else qb.push(x);
     }

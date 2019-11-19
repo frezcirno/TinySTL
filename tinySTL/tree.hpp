@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "allocator.hpp"
 #include "pair.hpp"
 #include "construct.hpp"
@@ -162,7 +162,7 @@ public:
     }
 
 private:
-    static value_type& _value(base_ptr x) { return static_cast<link_type>(x)->value; }
+    static value_type &_value(base_ptr x) { return static_cast<link_type>(x)->value; }
     static Key _key(base_ptr x) { return ValtoKey()(_value(x)); }
 
     void _reset()
@@ -216,6 +216,8 @@ public:
     }
 
     pair<iterator, bool> insert_unique(const value_type &value);
+    // template <typename Arg>
+    // pair<iterator, bool> insert_unique(Arg&& value);
 
     iterator insert_unique(iterator pos, const value_type &value);
 
@@ -232,6 +234,8 @@ public:
 
     iterator find(const Key &key) const;
 
+    iterator lower_bound(const Key &key) const;
+    iterator upper_bound(const Key &key) const;
     pair<iterator, iterator> equal_range(const Key &key) const;
 };
 
@@ -628,6 +632,40 @@ void rb_tree<Key, Val, ValtoKey, Compare>::_erase_below(base_ptr pos)
         destroy(&_value(tmp));
         node_Alloc::deallocate(static_cast<link_type>(tmp));
     }
+}
+
+template <typename Key, typename Val, typename ValtoKey, typename Compare>
+typename rb_tree<Key, Val, ValtoKey, Compare>::iterator
+rb_tree<Key, Val, ValtoKey, Compare>::lower_bound(const Key &key) const
+{
+    base_ptr cur = _root();
+    base_ptr start = _header;
+    while (cur != nullptr) //找左边界
+        if (!key_compare(_key(cur), key))
+        { //大于等于key, 左转, 更新边界
+            start = cur;
+            cur = cur->left;
+        }
+        else //小于key, 右转
+            cur = cur->right;
+    return iterator(start);
+}
+
+template <typename Key, typename Val, typename ValtoKey, typename Compare>
+typename rb_tree<Key, Val, ValtoKey, Compare>::iterator
+rb_tree<Key, Val, ValtoKey, Compare>::upper_bound(const Key &key) const
+{
+    base_ptr cur = _root();
+    base_ptr finish = _header;
+    while (cur != nullptr) //找右边界
+        if (key_compare(key, _key(cur)))
+        { //大于key, 更新右边界(大于key)
+            finish = cur;
+            cur = cur->left;
+        }
+        else //小于等于key
+            cur = cur->right;
+    return iterator(finish);
 }
 
 template <typename Key, typename Val, typename ValtoKey, typename Compare>

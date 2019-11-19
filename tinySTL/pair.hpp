@@ -1,5 +1,5 @@
-#pragma once
-#include <ostream>
+﻿#pragma once
+// #include <ostream>
 namespace tinySTL
 {
 
@@ -13,8 +13,6 @@ struct pair
 
     pair() : first(), second() {}
     pair(const T1 &v1, const T2 &v2) : first(v1), second(v2) {}
-    // template <typename T3, typename T4>
-    // pair(const T3 &v3, const T4 &v4) : first(v3), second(v4) {}
     pair(const pair<T1, T2> &rhs) : first(rhs.first), second(rhs.second) {}
 
     pair &operator=(const pair &rhs)
@@ -23,7 +21,30 @@ struct pair
         second = rhs.second;
         return *this;
     }
+
+    template <typename T3, typename T4>
+    pair(const pair<T3, T4> &rhs) : first(rhs.first), second(rhs.second) {}
+
+    template <typename T3, typename T4>
+    pair &operator=(const pair<T3, T4> &rhs)
+    {
+        first = rhs.first;
+        second = rhs.second;
+        return *this;
+    }
 };
+
+template <typename T1, typename T2>
+inline pair<T1, T2> make_pair(T1 &t1, T2 &t2)
+{
+    return pair<T1, T2>(t1, t2);
+}
+
+template <typename T1, typename T2>
+inline pair<T1, T2> make_pair(const T1 &t1,const T2 &t2)
+{
+    return pair<T1, T2>(t1, t2);
+}
 
 template <typename T1, typename T2>
 inline bool operator==(const pair<T1, T2> &lhs, const pair<T1, T2> &rhs)
@@ -61,12 +82,12 @@ inline bool operator>=(const pair<T1, T2> &lhs, const pair<T1, T2> &rhs)
     return !(lhs < rhs);
 }
 
-template <typename T1, typename T2>
-std::ostream &operator<<(std::ostream &os, const pair<T1, T2> &p)
-{
-    os << "(" << p.first << ", " << p.second << ")";
-    return os;
-}
+// template <typename T1, typename T2>
+// std::ostream &operator<<(std::ostream &os, const pair<T1, T2> &p)
+// {
+//     os << "(" << p.first << ", " << p.second << ")";
+//     return os;
+// }
 
 template <class Pair>
 struct get_first

@@ -1,4 +1,6 @@
-#pragma once
+﻿#pragma once
+#define _CRT_SECURE_NO_WARNINGS
+#include <cstddef>
 #include "functor.hpp"
 #include "type_traits.hpp"
 namespace tinySTL
@@ -12,15 +14,13 @@ template <class Iter>
 void push_heap(Iter start, Iter end)
 {
     typedef typename iterator_traits<Iter>::value_type value_type;
-    value_type value = *(end - 1);
-    _sift_fix(start, 0, end - start - 1, value, less<value_type>());
+    _sift_fix(start, 0, end - start - 1, *(end - 1), less<value_type>());
 }
 template <class Iter, class Compare>
 void push_heap(Iter start, Iter end, Compare &comp)
 {
     typedef typename iterator_traits<Iter>::value_type value_type;
-    value_type value = *(end - 1);
-    _sift_fix(start, 0, end - start - 1, value, comp);
+    _sift_fix(start, 0, end - start - 1, *(end - 1), comp);
 }
 
 /**
@@ -51,31 +51,29 @@ void pop_heap(Iter start, Iter end, Compare &comp)
 template <class Iter>
 void make_heap(Iter start, Iter end)
 {
-    typedef typename iterator_traits<Iter>::value_type value_type;
-    if (end - start < 2)
-        return;
-    int len = end - start;
-    int tofix = (len - 2) / 2;
-    while (tofix >= 0)
+    ptrdiff_t len = end - start;
+    if (len < 2)        return;
+    ptrdiff_t hole = (len - 2) / 2;
+    while (hole >= 0)
     {
-        //调整 tofix 节点
-        value_type value = *(start + tofix);
-        _sink_fix(start, len, tofix, value, less<value_type>());
-        --tofix;
+        //调整 hole 节点
+        _sink_fix(start, len, hole, *(start + hole),
+            less<iterator_traits<Iter>::value_type>());
+        --hole;
     }
 }
+
 template <class Iter, class Compare>
 void make_heap(Iter start, Iter end, Compare comp)
 {
-    if (end - start < 2)
-        return;
-    int len = end - start;
-    int tofix = (len - 2) / 2;
-    while (tofix > 0)
+    ptrdiff_t len = end - start;
+    if (len < 2) return;
+    ptrdiff_t hole = (len - 2) / 2;
+    while (hole > 0)
     {
-        //调整 tofix 节点
-        _sink_fix(start, len, tofix, *(start + tofix), comp);
-        --tofix;
+        //调整 hole 节点
+        _sink_fix(start, len, hole, *(start + hole), comp);
+        --hole;
     }
 }
 
@@ -83,9 +81,13 @@ void make_heap(Iter start, Iter end, Compare comp)
  * 功能：向上调整hole的位置, 找到合适的位置将value存入
  * **/
 template <class Iterator, typename T, class Compare>
-void _sift_fix(Iterator first, int top, int hole, const T &value, Compare comp)
+void _sift_fix(Iterator first,
+    ptrdiff_t           top,
+    ptrdiff_t           hole,
+    T                   value,
+    Compare             comp)
 {
-    int parent = (hole - 1) / 2;
+    ptrdiff_t parent = (hole - 1) / 2;
     while (parent >= top && comp(*(first + parent), value))
     {
         *(first + hole) = *(first + parent);
@@ -99,10 +101,14 @@ void _sift_fix(Iterator first, int top, int hole, const T &value, Compare comp)
  * 功能：向下调整hole的位置, 找到合适的位置将value存入
  * **/
 template <class Iterator, typename T, class Compare>
-void _sink_fix(Iterator first, int len, int hole, const T &value, Compare comp)
+void _sink_fix(Iterator first,
+    ptrdiff_t           len,
+    ptrdiff_t           hole,
+    T                   value,
+    Compare             comp)
 {
     /* 1.将hole下移到叶子处 */
-    int bigChild = 2 * hole + 2; //从右孩子开始考虑
+    ptrdiff_t bigChild = 2 * hole + 2;  //从右孩子开始考虑
     while (bigChild < len)
     {
         if (comp(*(first + bigChild), *(first + bigChild - 1)))
