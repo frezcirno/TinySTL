@@ -3,9 +3,3 @@
 *.gch
 *.cbp
 *.layout
-tinySTL/allocator
-tinySTL/test
-tinySTL/Deque
-tinySTL/Vector
-tinySTL/test.cpp
-backup.zip

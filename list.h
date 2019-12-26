@@ -18,7 +18,7 @@ template <typename T>
 struct _list_node
 {
     T _data;
-    _list_node<T> *_prev, *_next;
+    _list_node<T> *_prev = nullptr, *_next = nullptr;
     _list_node(const T &value) : _data(value) {}
 };
 

@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include <string>
 
 class BigInteger
@@ -41,9 +41,9 @@ class BigInteger
     long longValue();
 
   private:
-    int signum = 0;      //·ûºÅÎ»
-    int *mag = nullptr;  //ÊýÖµÎ»
+    int signum = 0;      //ï¿½ï¿½ï¿½ï¿½Î»
+    int *mag = nullptr;  //ï¿½ï¿½ÖµÎ»
     int bitCount = -1;   //
-    int bitLength = -1;  //Êý×Ö×ÜÎ»Êý(¶þ½øÖÆ)
+    int bitLength = -1;  //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½(ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½)
 
 };

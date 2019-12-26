@@ -9,7 +9,7 @@
 namespace tinySTL
 {
 template <typename T, class Compare = less<T>, class Sequence = vector<T>>
-class priority_queue
+class priority_queue // ！！！与STL不同的是，后两个模板参数的位置调换了
 {
   public:
     typedef typename Sequence::value_type value_type;

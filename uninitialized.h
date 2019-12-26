@@ -113,15 +113,16 @@ void __uninitialized_copy_default(Iter begin, Iter end, __false)
 }
 
 // 无初始值构造n个元素
-template <class Iter, typename T>
+template <class Iter>
 inline Iter uninitialized_fill_default(Iter pos, size_t n)
 {
+    typedef typename iterator_traits<Iter>::value_type T;
     typedef typename is_pod<T>::type is_POD;
     return __uninitialized_fill_default(pos, n, is_POD());
 }
-template <class Iter, typename T>
+template <class Iter>
 Iter __uninitialized_fill_default(Iter pos, size_t n, __true) {}
-template <class Iter, typename T>
+template <class Iter>
 Iter __uninitialized_fill_default(Iter pos, size_t n, __false)
 {
     while (n > 0)

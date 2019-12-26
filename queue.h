@@ -5,6 +5,21 @@
 #include "deque.h"
 namespace tinySTL
 {
+template <typename T, class Sequence>
+class queue;//forward declaration
+
+template <typename T, class Sequence>
+inline bool operator==(const queue<T, Sequence> &x, const queue<T, Sequence> &y)
+{
+    return x.c == y.c;
+}
+
+template <typename T, class Sequence>
+inline bool operator<(const queue<T, Sequence> &x, const queue<T, Sequence> &y)
+{
+    return x.c < y.c;
+}
+
 template <typename T, class Sequence = deque<T>>
 class queue
 {
@@ -29,20 +44,8 @@ class queue
     Sequence c;
 
   private:
-    friend bool operator==(const queue &, const queue &);
-    friend bool operator<(const queue &, const queue &);
+    friend bool operator== <>(const queue &, const queue &);
+    friend bool operator< <>(const queue &, const queue &);
 };
-
-template <typename T, class Sequence>
-inline bool operator==(const queue<T, Sequence> &x, const queue<T, Sequence> &y)
-{
-    return x.c == y.c;
-}
-
-template <typename T, class Sequence>
-inline bool operator<(const queue<T, Sequence> &x, const queue<T, Sequence> &y)
-{
-    return x.c < y.c;
-}
 
 }  // namespace tinySTL

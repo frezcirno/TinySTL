@@ -44,8 +44,7 @@ class vector
     explicit vector(size_type count);
     explicit vector(size_type count, const_reference value);
 
-    template <class Iter>
-    vector(Iter begin, Iter end);
+    template <class Iter> vector(Iter begin, Iter end);
 
     vector(const vector &other);  //拷贝构造函数
 
@@ -96,28 +95,31 @@ class vector
     iterator erase(iterator pos);
     void push_back(const_reference value);
     void pop_back() { destroy(--_finish); }
+    iterator find(const_reference value)
+    {
+        return tinySTL::find(_element, _end, value);
+    }
 };
 
 template <typename T>
-inline vector<T>::vector(size_type count)
+inline vector<T>::vector(size_type capacity)
 {
-    _element = Alloc::allocate(count);
-    _finish = _element;
-    _end = _element + count;
+    _finish = _element = Alloc::allocate(capacity);
+    _end = _element + capacity;
 }
 
 template <typename T>
 inline vector<T>::vector(size_type count, const_reference value)
 {
     _element = Alloc::allocate(count);
-    _finish = _end = uninitialized_fill_n(_element, count, value);
+    _finish = _end = tinySTL::uninitialized_fill_n(_element, count, value);
 }
 
 template <typename T>
 inline vector<T>::vector(const vector &other)
 {
     _element = Alloc::allocate(other.size());
-    _finish = _end = uninitialized_copy(other.begin(), other.end(), _element);
+    _finish = _end = tinySTL::uninitialized_copy(other.begin(), other.end(), _element);
 }
 
 template <typename T>
@@ -125,7 +127,7 @@ template <class Iter>
 vector<T>::vector(Iter start, Iter finish)
 {
     _element = Alloc::allocate(finish - start);
-    _finish = _end = uninitialized_copy(start, finish, _element);
+    _finish = _end = tinySTL::uninitialized_copy(start, finish, _element);
 }
 
 template <typename T>
@@ -178,7 +180,7 @@ void vector<T>::assign(diff_type count, const_reference value)
     {
         diff_type mid = size();  //拷贝前一半,构造后一半
         fill(_element, _finish, value);
-        _finish = uninitialized_fill_n(_finish, count - mid, value);
+        _finish = tinySTL::uninitialized_fill_n(_finish, count - mid, value);
     }
 }
 
@@ -188,11 +190,12 @@ void vector<T>::reserve(size_type new_capacity)
     size_type old_size = size();
     if (new_capacity > capacity()) {  // reserve不能使容器变小
         T *new_elem = Alloc::allocate(new_capacity);
-        _end = uninitialized_copy(_element, _finish, new_elem);
+        tinySTL::uninitialized_copy(_element, _finish, new_elem);
         destroy(_element, _finish);
         Alloc::deallocate(_element);
         _element = new_elem;
         _finish = new_elem + old_size;
+        _end = new_elem + new_capacity;
     }
 }
 
@@ -200,13 +203,10 @@ template <typename T>
 void vector<T>::resize(size_type new_size)
 {
     size_type old_size = size();
-    if (new_size > old_size) {                   //增大
-        if (new_size < capacity() - old_size) {  //后面有空间
-            _finish = uninitialized_fill_default(end(), new_size - old_size);
-        } else {
-            reserve(new_size);
-            uninitialized_fill_default(end(), new_size - old_size);
-        }
+    if (new_size > old_size) {  //增大
+        if (new_size > capacity()) reserve(new_size);
+        _finish =
+            tinySTL::uninitialized_fill_default(_finish, new_size - old_size);
     } else if (new_size < old_size) {  //缩小
         destroy(_element + new_size, _end);
         _end = _element + new_size;
@@ -318,7 +318,8 @@ void vector<T>::push_back(const_reference value)
         } else {
             size_t new_cap = capacity() * 3 / 2;
             pointer newelem = Alloc::allocate(new_cap);
-            pointer newfinish = uninitialized_copy(_element, _finish, newelem);
+            pointer newfinish =
+                tinySTL::uninitialized_copy(_element, _finish, newelem);
             destroy(_element, _finish);
             Alloc::deallocate(_element);
             _element = newelem;
