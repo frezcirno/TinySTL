@@ -1,4 +1,4 @@
-﻿#define _CRT_SECURE_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS
 #include "priority_queue.hpp"
 #include "queue.hpp"
 #include <iostream>

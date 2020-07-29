@@ -1,4 +1,4 @@
-﻿#include "tree.hpp"
+#include "tree.hpp"
 #include <ctime>
 #include <cstdlib>
 #include <iostream>

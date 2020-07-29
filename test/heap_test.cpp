@@ -1,4 +1,4 @@
-﻿#include "vector.hpp"
+#include "vector.hpp"
 #include "heap.hpp"
 // #include <queue>
 #include <iostream>
