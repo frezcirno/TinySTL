@@ -1,4 +1,4 @@
-w#include "vector.hpp"
+#include "vector.hpp"
 #include <iostream>
 #include "mem_test.h"
 #include "deque.hpp"
