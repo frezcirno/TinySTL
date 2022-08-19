@@ -96,9 +96,15 @@ This repo is a personal, cutted implementation of the Standard Template Library(
 
     - Some container-independent algorithms
 
+### Utilities
+
 - functional
 
     - function object
+
+- tuple
+
+    - like pair, but can store any number of argument
 
 ### My extensions
 
