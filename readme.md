@@ -96,6 +96,10 @@ This repo is a personal, cutted implementation of the Standard Template Library(
 
     - Some container-independent algorithms
 
+- functional
+
+    - function object
+
 ### My extensions
 
 These don't exists in the real STL, but I'd like to implement them.
