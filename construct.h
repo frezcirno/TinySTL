@@ -32,9 +32,9 @@ inline void destroy(Iter begin, Iter end)
     return __destroy(begin, end, is_POD());
 }
 template <class Iter>
-inline void __destroy(Iter begin, Iter end, __true) {}
+inline void __destroy(Iter begin, Iter end, __true_type) {}
 template <class Iter>
-void __destroy(Iter begin, Iter end, __false)
+void __destroy(Iter begin, Iter end, __false_type)
 {
     while (begin != end)
     {

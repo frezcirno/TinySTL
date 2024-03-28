@@ -1,5 +1,10 @@
 #include <iostream>
+#include <tuple>
 #include "tuple.h"
+
+struct Empty {
+};
+
 int main(int argc, char const *argv[])
 {
     auto t1 = tinySTL::tuple();
@@ -17,5 +22,8 @@ int main(int argc, char const *argv[])
     tinySTL::get<1>(t4) = 5.12;
     std::cout << tinySTL::get<1>(t4) << std::endl;
     std::cout << tinySTL::get<2>(t4) << std::endl;
+
+    std::cout << sizeof(std::tuple<double, Empty>) << std::endl;
+    std::cout << sizeof(tinySTL::tuple<double, Empty>) << std::endl;
     return 0;
 }

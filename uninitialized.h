@@ -14,7 +14,7 @@ inline void uninitialized_fill(Iter begin, Iter end, const T &x)
     return __uninitialized_fill(begin, end, x, is_POD());
 }
 template <class Iter, typename T>
-void __uninitialized_fill(Iter begin, Iter end, const T &x, __true)
+void __uninitialized_fill(Iter begin, Iter end, const T &x, __true_type)
 {
     while (begin != end)
     {
@@ -23,7 +23,7 @@ void __uninitialized_fill(Iter begin, Iter end, const T &x, __true)
     }
 }
 template <class Iter, typename T>
-void __uninitialized_fill(Iter begin, Iter end, const T &x, __false)
+void __uninitialized_fill(Iter begin, Iter end, const T &x, __false_type)
 {
     while (begin != end)
     {
@@ -40,7 +40,7 @@ inline Iter uninitialized_fill_n(Iter pos, size_t n, const T &x)
     return __uninitialized_fill_n(pos, n, x, is_POD());
 }
 template <class Iter, typename T>
-Iter __uninitialized_fill_n(Iter pos, size_t n, const T &x, __true)
+Iter __uninitialized_fill_n(Iter pos, size_t n, const T &x, __true_type)
 {
     while (n > 0)
     {
@@ -51,7 +51,7 @@ Iter __uninitialized_fill_n(Iter pos, size_t n, const T &x, __true)
     return pos;
 }
 template <class Iter, typename T>
-Iter __uninitialized_fill_n(Iter pos, size_t n, const T &x, __false)
+Iter __uninitialized_fill_n(Iter pos, size_t n, const T &x, __false_type)
 {
     while (n > 0)
     {
@@ -71,7 +71,7 @@ inline Iter2 uninitialized_copy(Iter begin, Iter end, Iter2 dst)
     return __uninitialized_copy(begin, end, dst, is_POD());
 }
 template <class Iter, class Iter2>
-Iter2 __uninitialized_copy(Iter &begin, Iter &end, Iter2 &dst, __true)
+Iter2 __uninitialized_copy(Iter &begin, Iter &end, Iter2 &dst, __true_type)
 {
     while (begin != end)
     {
@@ -82,7 +82,7 @@ Iter2 __uninitialized_copy(Iter &begin, Iter &end, Iter2 &dst, __true)
     return dst;
 }
 template <class Iter, class Iter2>
-Iter2 __uninitialized_copy(Iter &begin, Iter &end, Iter2 &dst, __false)
+Iter2 __uninitialized_copy(Iter &begin, Iter &end, Iter2 &dst, __false_type)
 {
     while (begin != end)
     {
@@ -101,9 +101,9 @@ inline void uninitialized_copy_default(Iter begin, Iter end)
     return __uninitialized_copy_default(begin, end,  is_POD());
 }
 template <class Iter, typename T>
-void __uninitialized_copy_default(Iter begin, Iter end, __true) {}
+void __uninitialized_copy_default(Iter begin, Iter end, __true_type) {}
 template <class Iter, typename T>
-void __uninitialized_copy_default(Iter begin, Iter end, __false)
+void __uninitialized_copy_default(Iter begin, Iter end, __false_type)
 {
     while (begin != end)
     {
@@ -121,9 +121,9 @@ inline Iter uninitialized_fill_default(Iter pos, size_t n)
     return __uninitialized_fill_default(pos, n, is_POD());
 }
 template <class Iter>
-Iter __uninitialized_fill_default(Iter pos, size_t n, __true) {}
+Iter __uninitialized_fill_default(Iter pos, size_t n, __true_type) {}
 template <class Iter>
-Iter __uninitialized_fill_default(Iter pos, size_t n, __false)
+Iter __uninitialized_fill_default(Iter pos, size_t n, __false_type)
 {
     while (n > 0)
     {

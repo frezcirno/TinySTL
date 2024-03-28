@@ -1,67 +1,77 @@
 #pragma once
+
 #include <new>
-#include <cstddef>
+#include "move.h"
 
 namespace tinySTL
 {
-//分配器
+// 分配器
 template <typename T>
 class allocator
 {
-public:
+  public:
     typedef T value_type;
     typedef value_type *pointer;
     typedef value_type &reference;
     typedef const value_type *const_pointer;
     typedef const value_type &const_reference;
-    typedef size_t size_type;
-    typedef ptrdiff_t diff_type;
+    typedef std::size_t size_type;
+    typedef std::ptrdiff_t diff_type;
 
-    //空间分配
+    // 空间分配
     static pointer allocate(size_type n = 1)
     {
         pointer space = static_cast<pointer>(::operator new(n * sizeof(T)));
-        if (!space)
-            throw "::operator new error!";
+        if (!space) throw "::operator new error!";
         return space;
     }
-    static void deallocate(pointer p) { ::operator delete(p); }
 
-    //取地址
+    static void deallocate(pointer p, size_type n = 1) { ::operator delete(p); }
+
+    // 取地址
     static pointer address(reference x) { return (pointer)&x; }
+
+    // 构造和析构
+    template <typename... Args>
+    static void construct(pointer p, Args &&...args)
+    {
+        ::new ((void *)p) T(forward<Args>(args)...);
+    }
+
+    static void destroy(pointer p) { p->~T(); }
 };
 
-//阻止类型
+// 阻止类型
 template <typename T>
-class allocator<const T>//类型不能为const
+class allocator<const T>  // 类型不能为const
 {
-public:
+  public:
     typedef T value_type;
 };
 
 template <typename T>
-class allocator<volatile T>//类型不能为volatile
+class allocator<volatile T>  // 类型不能为volatile
 {
-public:
+  public:
     typedef T value_type;
 };
 
 template <typename T>
 class allocator<const volatile T>
 {
-public:
+  public:
     typedef T value_type;
 };
 
 template <>
 class allocator<void>
 {
-public:
+  public:
     typedef void value_type;
     typedef void *pointer;
     typedef const void *const_pointer;
-    typedef size_t size_type;
-    typedef ptrdiff_t difference_type;
+    typedef std::size_t size_type;
+    typedef std::ptrdiff_t difference_type;
 };
 
-} // namespace tinySTL
+}  // namespace tinySTL

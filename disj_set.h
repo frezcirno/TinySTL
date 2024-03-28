@@ -15,8 +15,8 @@ class disj_set
     const T find(const T &x)
     {
         if (parent.count(x) == 0) parent[x] = x;
-		//路径压缩
-		return x == parent[x] ? x : (parent[x] = find(parent[x]));
+        // 路径压缩
+        return x == parent[x] ? x : (parent[x] = find(parent[x]));
     }
 
   public:
