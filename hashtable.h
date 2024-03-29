@@ -33,38 +33,44 @@ struct Scoped_node {
     ~Scoped_node() { _alloc->deallocate(_node); }
 };
 
+template <typename _Key, typename _Val, typename _Hash>
+struct HashTable;
+
 template <typename _Key, typename V, bool Const, typename _Hash>
 struct Node_iterator {
   public:
     typedef _Key key_type;
     typedef V value_type;
     typedef Hash_node<V> __node_type;
+    typedef HashTable<_Key, V, _Hash> __table_type;
     typedef __conditional_t<Const, const value_type *, value_type *> pointer;
     typedef __conditional_t<Const, const value_type &, value_type &> reference;
     typedef std::ptrdiff_t difference_type;
 
+    friend struct HashTable<_Key, V, _Hash>;
+
   private:
-    __node_type *__cur;
+    __node_type *cur;
 
   public:
     Node_iterator() = default;
 
-    explicit Node_iterator(__node_type *p) noexcept : __cur(p) {}
+    explicit Node_iterator(__node_type *p) noexcept : cur(p) {}
 
-    reference operator*() const noexcept { return __cur->value; }
+    reference operator*() const noexcept { return cur->value; }
 
-    pointer operator->() const noexcept { return &__cur->value; }
+    pointer operator->() const noexcept { return &cur->value; }
 
     Node_iterator &operator++() noexcept
     {
-        __cur = __cur->next;
+        cur = cur->next;
         return *this;
     }
 
     Node_iterator operator++(int) noexcept
     {
         Node_iterator tmp(*this);
-        __cur = __cur->next;
+        cur = cur->next;
         return tmp;
     }
 };
@@ -172,8 +178,7 @@ struct HashTable {
     allocator<__node_ptr> __bucket_Alloc;
 
   private:
-    __node_type **__buckets = &__single_bucket_opt;
-    __node_type *__single_bucket_opt = nullptr;
+    __node_type **__buckets;
     __node_type __sentinel_node;
 
     std::size_t __bucket_count = 1;
@@ -276,7 +281,10 @@ struct HashTable {
     __node_ptr _begin() const noexcept { return __sentinel_node.next; }
 
   public:
-    HashTable() = default;
+    HashTable() : __bucket_count(1), __size(0)
+    {
+        __buckets = _allocate_buckets(1);
+    }
 
     explicit HashTable(size_t bucket_count_hint)
     {
@@ -348,6 +356,14 @@ struct HashTable {
         return nullptr;
     }
 
+    __node_ptr _get_previous_node(size_type bkt, __node_ptr n)
+    {
+        // must be non-null
+        __node_ptr p = __buckets[bkt];
+        while (p->next != n) p = p->next;
+        return p;
+    }
+
     __node_ptr
     _find_node(size_type bkt, const key_type &key, __hash_code hash_code)
     {
@@ -374,8 +390,7 @@ struct HashTable {
         _deallocate_buckets();
 
         __bucket_count = 1;
-        __single_bucket_opt = nullptr;
-        __buckets = &__single_bucket_opt;
+        __buckets = _allocate_buckets(1);
         __sentinel_node.next = nullptr;
         __size = 0;
     }
@@ -569,7 +584,7 @@ struct HashTable {
     {
         __node_ptr node = _build(__arg.first, __arg.second);
         __hash_code hash_code = _hash_code(node->key);
-        return _insert_multi_node(__hint->__cur, hash_code, node);
+        return _insert_multi_node(__hint->cur, hash_code, node);
     }
 
     template <typename _Arg>
@@ -595,15 +610,7 @@ struct HashTable {
 
     void clear()
     {
-        for (size_t i = 0; i < __bucket_count; ++i) {
-            __node_ptr cur = __buckets[i];
-            while (cur) {
-                __node_ptr next = cur->next;
-                __node_Alloc.destroy(cur);
-                __node_Alloc.deallocate(cur);
-                cur = next;
-            }
-        }
+        _deallocate_nodes(_begin());
         __size = 0;
         __sentinel_node.next = nullptr;
     }
@@ -674,6 +681,67 @@ struct HashTable {
         const_iterator pos = find(key);
         if (pos == end()) throw std::out_of_range("key not found");
         return pos->second;
+    }
+
+    void
+    _remove_bucket_begin(size_type bkt, __node_ptr next, size_type next_bkt)
+    {
+        if (!next || next_bkt != bkt) {
+            // Bucket is now empty
+            // First update next bucket if any
+            if (next) __buckets[next_bkt] = __buckets[bkt];
+
+            // Second update before begin node if necessary
+            if (&__sentinel_node == __buckets[bkt]) __sentinel_node.next = next;
+            __buckets[bkt] = nullptr;
+        }
+    }
+
+    iterator _erase(size_type bkt, __node_ptr prev, __node_ptr node)
+    {
+        if (prev == __buckets[bkt]) {
+            _remove_bucket_begin(bkt, node->next, _bucket_index(*node->next));
+        } else if (node->next) {
+            size_type next_bkt = _bucket_index(*node->next);
+            if (next_bkt != bkt) __buckets[next_bkt] = prev;
+        }
+
+        prev->next = node->next;
+        iterator pos(node->next);
+        _deallocate_node(node);
+        --__size;
+
+        return pos;
+    }
+
+    iterator erase(iterator it) { return erase(const_iterator(it.cur)); }
+
+    iterator erase(const_iterator it)
+    {
+        __node_ptr node = it.cur;
+        size_type bkt = _bucket_index(*node);
+        __node_ptr prev = _get_previous_node(bkt, node);
+        return _erase(bkt, prev, node);
+    }
+
+    size_type erase(const key_type &key)
+    {
+        __hash_code hash_code = _hash_code(key);
+        size_type bkt = _bucket_index(hash_code);
+        __node_ptr prev = _find_before_node(bkt, key, hash_code);
+        if (!prev) return 0;
+
+        __node_ptr node = prev->next;
+        prev->next = node->next;
+
+        if (node->next) {
+            // update the bucket link of the next node
+            __buckets[_bucket_index(*node->next)] = prev;
+        }
+
+        _deallocate_node(node);
+        --__size;
+        return 1;
     }
 };
 

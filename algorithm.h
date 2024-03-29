@@ -1,8 +1,6 @@
 #pragma once
 
-#ifndef _CRT_SECURE_NO_WARNINGS
-#    define _CRT_SECURE_NO_WARNINGS
-#endif
+#include <stdlib.h>
 
 namespace tinySTL
 {
@@ -74,7 +72,7 @@ void random_shuffle(Iter first, Iter last)
 {
     ptrdiff_t rest = last - first;
     while (first != last) {
-        swap(*first, *(first + rand() % rest));
+        swap(*first, *(first + ::rand() % rest));
         --rest;
         ++first;
     }
