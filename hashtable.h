@@ -36,21 +36,28 @@ struct Scoped_node {
 template <typename _Key, typename _Val, typename _Hash>
 struct HashTable;
 
-template <typename _Key, typename V, bool Const, typename _Hash>
+template <typename _Key, typename _Val, bool _Const, typename _Hash>
 struct Node_iterator {
   public:
     typedef _Key key_type;
-    typedef V value_type;
-    typedef Hash_node<V> __node_type;
-    typedef HashTable<_Key, V, _Hash> __table_type;
-    typedef __conditional_t<Const, const value_type *, value_type *> pointer;
-    typedef __conditional_t<Const, const value_type &, value_type &> reference;
+    typedef _Val value_type;
+
+    typedef HashTable<_Key, _Val, _Hash> __table_type;
+    typedef Hash_node<_Val> __node_type;
+    typedef __node_type *__node_ptr;
+
+    typedef
+        typename __conditional_t<_Const, const value_type *, value_type *>::type
+            pointer;
+    typedef
+        typename __conditional_t<_Const, const value_type &, value_type &>::type
+            reference;
     typedef std::ptrdiff_t difference_type;
 
-    friend struct HashTable<_Key, V, _Hash>;
+    friend __table_type;
 
   private:
-    __node_type *cur;
+    __node_ptr cur;
 
   public:
     Node_iterator() = default;
@@ -72,6 +79,12 @@ struct Node_iterator {
         Node_iterator tmp(*this);
         cur = cur->next;
         return tmp;
+    }
+
+    friend bool operator==(const Node_iterator &x,
+        const Node_iterator &y) noexcept
+    {
+        return x.cur == y.cur;
     }
 };
 
@@ -345,18 +358,19 @@ struct HashTable {
         return static_cast<float>(__size) / static_cast<float>(__bucket_count);
     }
 
-    __node_ptr
-    _find_before_node(size_type bkt, const key_type &key, __hash_code hash_code)
+    __node_ptr _find_before_node(size_type bkt,
+        const key_type &key,
+        __hash_code hash_code) const noexcept
     {
-        __node_ptr p = &__sentinel_node;
+        __node_ptr p = (__node_ptr)&__sentinel_node;
         while (p->next) {
-            if (p->next->_key == key) return p;
+            if (p->next->value.first == key) return p;
             p = p->next;
         }
         return nullptr;
     }
 
-    __node_ptr _get_previous_node(size_type bkt, __node_ptr n)
+    __node_ptr _get_previous_node(size_type bkt, __node_ptr n) const noexcept
     {
         // must be non-null
         __node_ptr p = __buckets[bkt];
@@ -364,8 +378,9 @@ struct HashTable {
         return p;
     }
 
-    __node_ptr
-    _find_node(size_type bkt, const key_type &key, __hash_code hash_code)
+    __node_ptr _find_node(size_type bkt,
+        const key_type &key,
+        __hash_code hash_code) const noexcept
     {
         __node_ptr p = _find_before_node(bkt, key, hash_code);
         return p ? p->next : nullptr;
@@ -651,7 +666,7 @@ struct HashTable {
         if (p) return p->value.second;
 
         // default construct mapped_type
-        __node_type node = _allocate_node(key, {});
+        __node_type node = _allocate_node(key, mapped_type{});
         iterator pos = _insert_unique_node(bkt, hash_code, node);
         return pos->second;
     }
@@ -664,7 +679,7 @@ struct HashTable {
         if (p) return p->value.second;
 
         // default construct mapped_type
-        __node_type node = _allocate_node(move(key), {});
+        __node_ptr node = _allocate_node(move(key), mapped_type{});
         iterator pos = _insert_unique_node(bkt, hash_code, node);
         return pos->second;
     }
