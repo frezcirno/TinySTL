@@ -17,18 +17,18 @@ class getNumber
 int main()
 {
     // basic function
-    tinySTL::function<int(int)> getNumber(getOne);
+    tiny::function<int(int)> getNumber(getOne);
     std::cout << getNumber(3) << std::endl;
 
     // class which override operator()
-    tinySTL::function<int(int, int)> getNumber2(AddTwo{});
+    tiny::function<int(int, int)> getNumber2(AddTwo{});
     std::cout << getNumber2(2, 3) << std::endl;
 
-    tinySTL::function<int(int, int)> getNumber3 = getNumber2;
+    tiny::function<int(int, int)> getNumber3 = getNumber2;
     std::cout << getNumber3(3, 4) << std::endl;
 
     int out = 1;
-    tinySTL::function<int()> getNumber4 = [&]() { return out; };
+    tiny::function<int()> getNumber4 = [&]() { return out; };
     std::cout << getNumber4() << std::endl;
 
     return 0;

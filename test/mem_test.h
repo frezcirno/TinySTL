@@ -3,13 +3,12 @@
 #include <cstring>
 #include <iostream>
 
-
 class mem_test
 {
     int id;
     char *name;
 
-public:
+  public:
     mem_test() : id(0), name(new char[20])
     {
         strcpy(name, "uninitialized");
@@ -39,13 +38,14 @@ public:
     friend std::ostream &operator<<(std::ostream &os, const mem_test &x);
     friend struct mem_comp;
 };
+
 std::ostream &operator<<(std::ostream &os, const mem_test &x)
 {
     os << "{" << x.id << " " << x.name << "}";
     return os;
 }
-struct mem_comp
-{
+
+struct mem_comp {
     bool operator()(const mem_test &x, const mem_test &y) const
     {
         return x.id < y.id;

@@ -1,28 +1,16 @@
-#include "array.hpp"
+#include <gtest/gtest.h>
 #include <array>
-#include <iostream>
+#include "tiny/array.h"
 
-using namespace std;
-
-template <typename T>
-void print(T &vec)
+TEST(array, constructor)
 {
-    for (auto it = vec.begin(); it < vec.end(); it++)
-    {
-        cout << *it << " ";
-    }
-    cout << endl;
+    tiny::array<int, 100> a;
+    EXPECT_EQ(a.size(), 100);
 }
 
-int main(int argc, char const *argv[])
+TEST(array, fill)
 {
-    tinySTL::array<int, 100> a;
-    for (auto it = a.begin(); it != a.end(); it++)
-    {
-        *it = 6;
-    }
-
-    print(a);
-
-    return 0;
+    tiny::array<int, 100> a;
+    a.fill(1);
+    for (auto it = a.begin(); it != a.end(); it++) { EXPECT_EQ(*it, 1); }
 }

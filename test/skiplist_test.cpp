@@ -1,9 +1,9 @@
 #include <cassert>
-#include "../skiplist.h"
+#include "tiny/skiplist.h"
 
 int main(int argc, char const *argv[])
 {
-    tinySTL::SkipList<int, int> map;
+    tiny::SkipList<int, int> map;
     assert(map.size() == 0);
 
     map.insert({1, 2});

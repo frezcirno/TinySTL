@@ -1,12 +1,12 @@
 #include <map>
-#include "map.hpp"
+#include "map.h"
 #include <iostream>
 #include "mem_test.h"
 
 int main(int argc, char const *argv[])
 {
     using namespace std; //+  +  ++-
-    // using namespace tinySTL; //+  ++-  +++--
+    // using namespace tiny; //+  ++-  +++--
     mem_test a(666, "xiaoming");
     mem_test b(233, "lihua");
     mem_test c(888, "ahua");
@@ -28,7 +28,7 @@ int main(int argc, char const *argv[])
     dict.insert(make_pair(233, b));
     std::cout << "insert2end\n";
 
-    print(dict);
+    // print(dict);
 
     std::cout << "\nreturn\n";
     return 0;

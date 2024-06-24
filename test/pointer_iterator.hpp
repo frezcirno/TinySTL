@@ -1,6 +1,6 @@
 #pragma once
-#include "type_traits.hpp"
-namespace tinySTL
+#include "type_traits.h"
+namespace tiny
 {
 template <typename T>
 class pointer_iterator
@@ -47,4 +47,4 @@ template <typename T>
 inline typename pointer_iterator<T>::diff_type operator-(const pointer_iterator<T>& x, const pointer_iterator<T>& y){    return (x.base()-y.base());}   
 
 
-} // namespace tinySTL
+} // namespace tiny

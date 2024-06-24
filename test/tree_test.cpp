@@ -1,11 +1,11 @@
-#include "tree.hpp"
+#include "tree.h"
 #include <ctime>
 #include <cstdlib>
 #include <iostream>
 // #include <map>
 //#include <bits/stl_tree.h>
 using namespace std;
-using tree_type = tinySTL::rb_tree<int, int, tinySTL::identity<int>, tinySTL::less<int>>;
+using tree_type = tiny::rb_tree<int, int, tiny::identity<int>, tiny::less<int>>;
 template <typename Tree>
 void print_tree(const Tree &tree)
 {

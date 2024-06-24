@@ -1,6 +1,6 @@
 #define _CRT_SECURE_NO_WARNINGS
-#include "priority_queue.hpp"
-#include "queue.hpp"
+#include "priority_queue.h"
+#include "queue.h"
 #include <iostream>
 #include "mem_test.h"
 using namespace std;
@@ -17,8 +17,8 @@ int main(int argc, char const *argv[])
 {
     int a[] = {1, 2, 3, 4, 5, 10, 20, 30, 40, 50};
 
-    tinySTL::queue<int> iq;
-    tinySTL::priority_queue<int> ivec;
+    tiny::queue<int> iq;
+    tiny::priority_queue<int> ivec;
     for (auto i = 0; i < 10; i++) {
         ivec.push(a[i]);
         printi(ivec._container);
